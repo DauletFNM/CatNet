@@ -70,7 +70,7 @@ WSGI_APPLICATION = 'catnet_project.wsgi.application'
 
 # База данных Supabase
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 # Настройки Allauth
