@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h2 class="mb-4">Поиск людей</h2>
+    <form method="GET" action="{% url 'user_search' %}" class="d-flex mb-4">
+        <input type="text" name="q" class="form-control me-2 rounded-pill" placeholder="Введите имя..." value="{{ query|default:'' }}">
+        <button type="submit" class="btn btn-primary rounded-pill px-4">Найти</button>
+    </form>
+
+    <div class="row">
+        {% for user in results %}
+            <div class="col-md-4 mb-3">
+                <div class="card p-3 text-center border">
+                    <h5 class="mb-3">{{ user.username }}</h5>
+                    <a href="{% url 'send_friend_request' user.id %}" class="btn btn-outline-primary btn-sm rounded-pill">
+                        + Добавить в друзья
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

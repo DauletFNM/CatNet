@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                Чат с другом
+            </div>
+            
+            <div id="chat-messages" class="card-body bg-light" style="height: 400px; overflow-y: auto;">
+                {% for msg in messages %}
+                    <div class="mb-3 {% if msg.sender == user %}text-end{% endif %}">
+                        <div class="d-inline-block p-2 rounded-3 shadow-sm 
+                            {% if msg.sender == user %}bg-primary text-white{% else %}bg-white{% endif %}">
+                            {{ msg.text }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="card-footer bg-white border-0">
+                <form id="chat-form" class="d-flex">
+                    {% csrf_token %}
+                    <input type="text" id="msg-text" class="form-control rounded-pill me-2" placeholder="Напишите..." required>
+                    <button type="submit" class="btn btn-primary rounded-circle">➡️</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+    // 1. Настройки (Замени на свои из Supabase -> Settings -> API)
+    const supabaseUrl = 'https://your-project.supabase.co';
+    const supabaseKey = 'your-anon-key';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // 2. РЕАЛЬНОЕ ВРЕМЯ: Слушаем новые сообщения
+    supabaseClient
+        .channel('public:core_message')
+        .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'core_message',
+            filter: 'room_id=eq.{{ room.id }}' 
+        }, (payload) => {
+            console.log('Новое сообщение получено!');
+            // Если прислал КТО-ТО ДРУГОЙ, обновляем страницу, чтобы увидеть текст
+            if (payload.new.sender_id != {{ user.id }}) {
+                location.reload(); 
+            }
+        })
+        .subscribe();
+
+    // 3. ОТПРАВКА: Чтобы страница не перезагружалась, когда ТЫ пишешь
+    const chatForm = document.getElementById('chat-form');
+    chatForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const textInput = document.getElementById('msg-text');
+        const text = textInput.value;
+
+        const formData = new FormData();
+        formData.append('text', text);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        // Отправляем в Django по сети "втихую"
+        await fetch("{% url 'chat_room' room.id %}", {
+            method: "POST",
+            body: formData
+        });
+
+        textInput.value = ''; // Очищаем поле
+        location.reload();    // Обновляем, чтобы увидеть свое сообщение
+    };
+</script>
+{% endblock %}

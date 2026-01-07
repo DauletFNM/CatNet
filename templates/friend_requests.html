@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><title>Заявки в друзья</title></head>
+<body>
+    <h1>Входящие заявки</h1>
+    <a href="{% url 'home' %}">На главную</a>
+    <hr>
+    <ul>
+        {% for req in requests %}
+            <li>
+                Пользователь <strong>{{ req.from_user.username }}</strong> хочет с вами дружить!
+                <a href="{% url 'accept_friend_request' req.id %}">Принять</a>
+            </li>
+        {% empty %}
+            <p>Новых заявок пока нет.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        {% if not user.is_authenticated %}
+            <div class="card p-5 mt-5 shadow-lg border-0">
+                <h1 class="display-4 fw-bold mb-3">🐱 CatNet 2.0</h1>
+                <p class="lead text-muted mb-5">Мессенджер для общения текстом и смайликами.</p>
+                
+                <div class="d-grid gap-3 col-6 mx-auto">
+                    <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                        Войти в аккаунт
+                    </a>
+                    
+                    <a href="{% url 'account_signup' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
+                        Создать профиль
+                    </a>
+
+                    <div class="position-relative my-4">
+                        <hr>
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">или</span>
+                    </div>
+
+                    <form method="post" action="{% url 'google_login' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow-sm w-100">
+                            <i class="bi bi-google"></i> Войти через Google
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="card p-4 text-start">
+                <h3 class="mb-4">Твои друзья</h3>
+                <div class="list-group">
+                    {% for friend in friends %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 border-0 shadow-sm">
+                            <span class="fw-bold">{{ friend.username }}</span>
+                            <a href="{% url 'start_chat' friend.id %}" class="btn btn-sm btn-primary px-4 rounded-pill">Написать</a>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">У тебя пока нет друзей. Попробуй найти кого-нибудь!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

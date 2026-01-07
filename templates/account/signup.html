@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %} {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 mt-5">
+            <div class="card-body p-5">
+                <h2 class="text-center fw-bold mb-4">Создать аккаунт</h2>
+                <p class="text-center text-muted mb-4">Присоединяйтесь к CatNet прямо сейчас</p>
+
+                <form method="POST" action="{% url 'account_signup' %}">
+                    {% csrf_token %}
+                    {{ form|crispy }} <button type="submit" class="btn btn-primary w-100 rounded-pill btn-lg mt-3 shadow-sm">
+                        Зарегистрироваться
+                    </button>
+                </form>
+
+                <div class="text-center mt-4">
+                    <span class="text-muted">Уже есть профиль?</span> 
+                    <a href="{% url 'account_login' %}" class="text-decoration-none fw-bold">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
