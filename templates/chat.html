@@ -33,12 +33,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-    // 1. Настройки (Замени на свои из Supabase -> Settings -> API)
-    const supabaseUrl = 'https://your-project.supabase.co';
-    const supabaseKey = 'your-anon-key';
+    // ПРЯМО СЮДА ВСТАВЛЯЕШЬ СВОИ ДАННЫЕ
+    const supabaseUrl = 'https://pqkdlmpnjkrgbrjehpfd.supabase.co'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxa2RsbXBuamtyZ2JyamVocGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NzQzMzUsImV4cCI6MjA4MzM1MDMzNX0.S_q6z6MQf-x987CJAbggwbexCvBSW-x0e_Hz789YSGE'; 
+    
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 2. РЕАЛЬНОЕ ВРЕМЯ: Слушаем новые сообщения
     supabaseClient
         .channel('public:core_message')
         .on('postgres_changes', { 
@@ -47,33 +47,12 @@
             table: 'core_message',
             filter: 'room_id=eq.{{ room.id }}' 
         }, (payload) => {
-            console.log('Новое сообщение получено!');
-            // Если прислал КТО-ТО ДРУГОЙ, обновляем страницу, чтобы увидеть текст
+            console.log('Новое сообщение пришло в базу!');
+            // Если отправил не ты, страница обновится сама
             if (payload.new.sender_id != {{ user.id }}) {
                 location.reload(); 
             }
         })
         .subscribe();
-
-    // 3. ОТПРАВКА: Чтобы страница не перезагружалась, когда ТЫ пишешь
-    const chatForm = document.getElementById('chat-form');
-    chatForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const textInput = document.getElementById('msg-text');
-        const text = textInput.value;
-
-        const formData = new FormData();
-        formData.append('text', text);
-        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-        // Отправляем в Django по сети "втихую"
-        await fetch("{% url 'chat_room' room.id %}", {
-            method: "POST",
-            body: formData
-        });
-
-        textInput.value = ''; // Очищаем поле
-        location.reload();    // Обновляем, чтобы увидеть свое сообщение
-    };
 </script>
 {% endblock %}
