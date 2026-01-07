@@ -4,9 +4,7 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                Чат с другом
-            </div>
+            <div class="card-header bg-primary text-white">Чат с другом</div>
             
             <div id="chat-messages" class="card-body bg-light" style="height: 400px; overflow-y: auto;">
                 {% for msg in messages %}
@@ -22,8 +20,8 @@
             <div class="card-footer bg-white border-0">
                 <form id="chat-form" class="d-flex">
                     {% csrf_token %}
-                    <input type="text" id="msg-text" class="form-control rounded-pill me-2" placeholder="Напишите..." required>
-                    <button type="button" id="emoji-button" class="btn btn-outline-secondary">😊</button>
+                    <input type="text" id="msg-text" class="form-control rounded-pill me-2" placeholder="Напишите..." required autocomplete="off">
+                    <button type="button" id="emoji-button" class="btn btn-outline-secondary me-2">😊</button>
                     <button type="submit" class="btn btn-primary rounded-circle">➡️</button>
                 </form>
             </div>
@@ -32,35 +30,28 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/emoji-button@latest/dist/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/emoji-button@latest/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@joylight/emoji-button@4.6.4/dist/index.min.js"></script>
 
 <script>
-    // Инициализация Supabase (твои ключи остаются те же)
+    // 1. Данные (Ключи те же)
     const supabaseUrl = 'https://pqkdlmpnjkrgbrjehpfd.supabase.co'; 
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxa2RsbXBuamtyZ2JyamVocGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NzQzMzUsImV4cCI6MjA4MzM1MDMzNX0.S_q6z6MQf-x987CJAbggwbexCvBSW-x0e_Hz789YSGE'; 
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 1. СМАЙЛИКИ (Исправленный блок)
-    const button = document.querySelector('#emoji-button');
-    const input = document.querySelector('#msg-text');
-    
-    // Настраиваем пикер так, чтобы он не терялся
+    // 2. СМАЙЛЫ (Исправлено под версию 4.6.4)
     const picker = new EmojiButton({
-        position: 'top-start',
-        rootElement: document.body // Это заставит окно смайлов быть поверх всего
+        position: 'auto'
     });
+    const emojiBtn = document.querySelector('#emoji-button');
+    const input = document.querySelector('#msg-text');
 
     picker.on('emoji', selection => {
         input.value += selection;
     });
 
-    button.addEventListener('click', () => {
-        picker.togglePicker(button);
-    });
+    emojiBtn.addEventListener('click', () => picker.togglePicker(emojiBtn));
 
-    // 2. REALTIME (Оставляем как есть)
+    // 3. REALTIME (Авто-обновление)
     supabaseClient
         .channel('public:core_message')
         .on('postgres_changes', { 
@@ -69,33 +60,38 @@
             table: 'core_message',
             filter: 'room_id=eq.{{ room.id }}' 
         }, (payload) => {
+            console.log('Новое сообщение!');
             if (payload.new.sender_id != {{ user.id }}) {
                 location.reload(); 
             }
         })
         .subscribe();
 
-    // 3. ОТПРАВКА БЕЗ ПЕРЕЗАГРУЗКИ (Это ускорит сайт!)
+    // 4. ОТПРАВКА (Быстрая, без тормозов)
     const chatForm = document.getElementById('chat-form');
-    chatForm.onsubmit = async (e) => {
-        e.preventDefault(); // Это отключает медленную перезагрузку!
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Останавливаем обычную отправку
         const text = input.value;
+        if(!text) return;
 
         const formData = new FormData();
         formData.append('text', text);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-        // Отправляем данные фоном
-        await fetch(window.location.href, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        });
+        try {
+            await fetch(window.location.href, {
+                method: "POST",
+                body: formData
+            });
+            input.value = '';
+            location.reload(); // Сразу видим своё сообщение
+        } catch (err) {
+            alert("Ошибка отправки!");
+        }
+    });
 
-        input.value = '';
-        location.reload(); // Обновляем только один раз после успеха
-    };
+    // Прокрутка вниз при загрузке
+    const chatBox = document.getElementById('chat-messages');
+    chatBox.scrollTop = chatBox.scrollHeight;
 </script>
 {% endblock %}
