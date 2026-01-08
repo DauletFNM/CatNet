@@ -1,19 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head><title>Заявки в друзья</title></head>
-<body>
-    <h1>Входящие заявки</h1>
-    <a href="{% url 'home' %}">На главную</a>
+{% extends "base.html" %} {% block title %}Заявки в друзья{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h2 class="mb-4">🐾 Входящие заявки</h2>
+    <a href="{% url 'home' %}" class="btn btn-outline-secondary btn-sm mb-3">← На главную</a>
     <hr>
-    <ul>
+    
+    <ul class="list-group">
         {% for req in requests %}
-            <li>
-                Пользователь <strong>{{ req.from_user.username }}</strong> хочет с вами дружить!
-                <a href="{% url 'accept_friend_request' req.id %}">Принять</a>
+            <li class="list-group-item d-flex justify-content-between align-items-center border-0 shadow-sm mb-2" style="border-radius: 15px;">
+                <div>
+                    Пользователь <strong class="text-primary">{{ req.from_user.username }}</strong> хочет с вами дружить!
+                </div>
+                <a href="{% url 'accept_friend_request' req.id %}" class="btn btn-success btn-sm">Принять</a>
             </li>
         {% empty %}
-            <p>Новых заявок пока нет.</p>
+            <div class="text-center py-5">
+                <p class="text-muted">Новых заявок пока нет. Мяу! 🐱</p>
+            </div>
         {% endfor %}
     </ul>
-</body>
-</html>
+</div>
+{% endblock %}
