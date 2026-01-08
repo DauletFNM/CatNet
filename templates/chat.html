@@ -30,40 +30,13 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/picmo@latest/dist/umd/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@picmo/renderer-fontawesome@latest/dist/umd/index.js"></script>
-
 <script>
-    // 1. Supabase (твои ключи)
+    // 1. Настройки Supabase
     const supabaseUrl = 'https://pqkdlmpnjkrgbrjehpfd.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxa2RsbXBuamtyZ2JyamVocGZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3NzQzMzUsImV4cCI6MjA4MzM1MDMzNX0.S_q6z6MQf-x987CJAbggwbexCvBSW-x0e_Hz789YSGE'; 
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 2. СМАЙЛЫ (Новый надежный способ через Picmo)
-    try {
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.bottom = '100px';
-        container.style.right = '20px';
-        container.style.display = 'none';
-        document.body.appendChild(container);
-
-        const picker = picmo.createPicker({ rootElement: container });
-        const emojiBtn = document.querySelector('#emoji-button');
-        const input = document.querySelector('#msg-text');
-
-        picker.on('emoji', selection => {
-            input.value += selection.emoji;
-        });
-
-        emojiBtn.addEventListener('click', () => {
-            container.style.display = container.style.display === 'none' ? 'block' : 'none';
-        });
-    } catch (e) {
-        console.log("Смайлы не загрузились, но чат работает");
-    }
-
-    // 3. REALTIME (Твой рабочий код)
+    // 2. REALTIME (Чтобы сообщения прилетали сразу)
     supabaseClient
         .channel('public:core_message')
         .on('postgres_changes', { 
@@ -78,24 +51,33 @@
         })
         .subscribe();
 
-    // 4. ОТПРАВКА БЕЗ ТОРМОЗОВ
+    // 3. БЫСТРАЯ ОТПРАВКА (Без долгой перезагрузки)
     const chatForm = document.getElementById('chat-form');
+    const input = document.getElementById('msg-text');
+
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const textInput = document.getElementById('msg-text');
-        const text = textInput.value;
+        const text = input.value;
         if(!text) return;
 
         const formData = new FormData();
         formData.append('text', text);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
+        // Отправляем запрос фоном
         await fetch(window.location.href, {
             method: "POST",
             body: formData
         });
-        textInput.value = '';
-        location.reload();
+
+        input.value = ''; // Очищаем поле
+        location.reload(); // Перезагружаем, чтобы увидеть свое сообщение
+    });
+
+    // 4. ПОДСКАЗКА ДЛЯ СМАЙЛИКОВ
+    const emojiBtn = document.querySelector('#emoji-button');
+    emojiBtn.addEventListener('click', () => {
+        alert("Используй клавиатуру: Win + . (на Windows) или зажми глобус (на телефоне)");
     });
 </script>
 {% endblock %}
