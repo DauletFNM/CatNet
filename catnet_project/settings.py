@@ -41,6 +41,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'csp.middleware.CSPMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -137,3 +138,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Это поможет Django корректно работать с файлами на сервере
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Настройки CSP
+CSP_DEFAULT_SRC = ("'self'",)
+# Разрешаем скрипты (включая 'unsafe-eval' для анимаций Lottie)
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://lottie.host")
+# Разрешаем стили
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com")
+# Разрешаем шрифты
+CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
+# Разрешаем картинки (и твои лапки на фоне)
+CSP_IMG_SRC = ("'self'", "data:", "https://www.transparenttextures.com")
+# Разрешаем подключение к Supabase (WebSockets)
+CSP_CONNECT_SRC = ("'self'", "https://*.supabase.co", "wss://*.supabase.co")
