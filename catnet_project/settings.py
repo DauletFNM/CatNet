@@ -73,6 +73,23 @@ DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
+# Настройки почты через Resend
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Для теста в консоли
+
+# Когда будешь готов отправлять реально:
+import resend
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+
+# Создадим кастомный бэкенд для Resend (вставь это в конец settings.py)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.resend.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'resend'
+EMAIL_HOST_PASSWORD = RESEND_API_KEY
+DEFAULT_FROM_EMAIL = 'onboarding@resend.dev' # Стандартный адрес для тестов
+
 # Настройки Allauth
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
