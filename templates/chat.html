@@ -3,26 +3,40 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">Чат с другом</div>
+        <div class="card shadow border-0" style="border-radius: 20px; overflow: hidden;">
+            <div class="card-header bg-primary text-white py-3 fw-bold">
+                <i class="fas fa-comments"></i> Чат с другом
+            </div>
             
-            <div id="chat-messages" class="card-body bg-light" style="height: 400px; overflow-y: auto;">
+            <div id="chat-messages" class="card-body bg-light" style="height: 500px; overflow-y: auto; display: flex; flex-direction: column;">
                 {% for msg in messages %}
-                    <div class="mb-3 {% if msg.sender == user %}text-end{% endif %}">
-                        <div class="d-inline-block p-2 rounded-3 shadow-sm 
-                            {% if msg.sender == user %}bg-primary text-white{% else %}bg-white{% endif %}">
-                            {{ msg.text }}
+                    <div class="mb-2 d-flex {% if msg.sender == user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                        <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 15px; 
+                            {% if msg.sender == user %}
+                                background: #6f42c1; color: white; border-bottom-right-radius: 2px;
+                            {% else %}
+                                background: white; color: #444; border-bottom-left-radius: 2px;
+                            {% endif %}">
+                            
+                            <div class="message-text">{{ msg.text }}</div>
+                            
+                            <div class="text-end" style="font-size: 0.65rem; opacity: 0.8; margin-top: 2px;">
+                                {{ msg.created_at|date:"H:i" }}
+                                {% if msg.sender == user %} <i class="fas fa-check-double" style="font-size: 0.6rem;"></i>{% endif %}
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            <div class="card-footer bg-white border-0">
-                <form id="chat-form" class="d-flex">
+            <div class="card-footer bg-white border-top-0">
+                <form id="chat-form" class="d-flex align-items-center">
                     {% csrf_token %}
-                    <input type="text" id="msg-text" class="form-control rounded-pill me-2" placeholder="Напишите..." required autocomplete="off">
-                    <button type="button" id="emoji-button" class="btn btn-outline-secondary me-2">😊</button>
-                    <button type="submit" class="btn btn-primary rounded-circle">➡️</button>
+                    <button type="button" id="emoji-button" class="btn btn-link text-decoration-none fs-4">😊</button>
+                    <input type="text" id="msg-text" class="form-control rounded-pill border-light bg-light px-4 me-2" placeholder="Напишите сообщение..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </form>
             </div>
         </div>
@@ -36,7 +50,15 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4d3BlaHl0cHhiYm5mbmFkYWZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNDE1NjgsImV4cCI6MjA4MzYxNzU2OH0.llHsbsMFpMBV1VdLou95WwNhO7jmX4NxpwPEv9ibqHY'; 
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    // 2. REALTIME (Чтобы сообщения прилетали сразу)
+    const chatMessages = document.getElementById('chat-messages');
+    
+    // Функция прокрутки вниз
+    const scrollToBottom = () => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+    scrollToBottom(); // При загрузке сразу вниз
+
+    // 2. REALTIME (Добавление сообщения без перезагрузки)
     supabaseClient
         .channel('public:core_message')
         .on('postgres_changes', { 
@@ -45,13 +67,31 @@
             table: 'core_message',
             filter: 'room_id=eq.{{ room.id }}' 
         }, (payload) => {
+            // Если пришло чужое сообщение — добавляем его в чат
             if (payload.new.sender_id != {{ user.id }}) {
-                location.reload(); 
+                appendMessage(payload.new.text, false, new Date(payload.new.created_at));
             }
         })
         .subscribe();
 
-    // 3. БЫСТРАЯ ОТПРАВКА (Без долгой перезагрузки)
+    // Функция отрисовки сообщения в HTML
+    function appendMessage(text, isMe, date) {
+        const time = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+        const msgHtml = `
+            <div class="mb-2 d-flex ${isMe ? 'justify-content-end' : 'justify-content-start'}">
+                <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 15px; 
+                    ${isMe ? 'background: #6f42c1; color: white; border-bottom-right-radius: 2px;' : 'background: white; color: #444; border-bottom-left-radius: 2px;'}">
+                    <div class="message-text">${text}</div>
+                    <div class="text-end" style="font-size: 0.65rem; opacity: 0.8; margin-top: 2px;">
+                        ${time} ${isMe ? '<i class="fas fa-check-double" style="font-size: 0.6rem;"></i>' : ''}
+                    </div>
+                </div>
+            </div>`;
+        chatMessages.insertAdjacentHTML('beforeend', msgHtml);
+        scrollToBottom();
+    }
+
+    // 3. ОТПРАВКА СООБЩЕНИЯ
     const chatForm = document.getElementById('chat-form');
     const input = document.getElementById('msg-text');
 
@@ -60,24 +100,23 @@
         const text = input.value;
         if(!text) return;
 
+        // Сразу показываем свое сообщение (для скорости)
+        appendMessage(text, true, new Date());
+        input.value = ''; 
+
         const formData = new FormData();
         formData.append('text', text);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-        // Отправляем запрос фоном
         await fetch(window.location.href, {
             method: "POST",
             body: formData
         });
-
-        input.value = ''; // Очищаем поле
-        location.reload(); // Перезагружаем, чтобы увидеть свое сообщение
     });
 
-    // 4. ПОДСКАЗКА ДЛЯ СМАЙЛИКОВ
-    const emojiBtn = document.querySelector('#emoji-button');
-    emojiBtn.addEventListener('click', () => {
-        alert("Используй клавиатуру: Win + . (на Windows) или зажми глобус (на телефоне)");
+    // 4. СМАЙЛИКИ
+    document.getElementById('emoji-button').addEventListener('click', () => {
+        alert("💡 На компьютере: нажмите Win + . (точка)\n💡 На телефоне: используйте смайлы на клавиатуре.");
     });
 </script>
 {% endblock %}
