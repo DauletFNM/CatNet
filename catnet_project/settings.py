@@ -82,14 +82,14 @@ import resend
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
-# Создадим кастомный бэкенд для Resend (вставь это в конец settings.py)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.resend.com'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
+EMAIL_PORT = 587             # Меняем с 465 на 587
+EMAIL_USE_TLS = True         # Меняем на True
+EMAIL_USE_SSL = False        # Меняем на False
 EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = RESEND_API_KEY
-DEFAULT_FROM_EMAIL = 'onboarding@resend.dev' # Стандартный адрес для тестов
+EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY')
+EMAIL_TIMEOUT = 10           # Чтобы сайт не висел больше 10 секунд
 
 # Настройки Allauth
 AUTHENTICATION_BACKENDS = [
