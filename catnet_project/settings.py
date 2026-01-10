@@ -82,14 +82,12 @@ import resend
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.resend.com'
-EMAIL_PORT = 587             # Меняем с 465 на 587
-EMAIL_USE_TLS = True         # Меняем на True
-EMAIL_USE_SSL = False        # Меняем на False
-EMAIL_HOST_USER = 'resend'
-EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY')
-EMAIL_TIMEOUT = 10           # Чтобы сайт не висел больше 10 секунд
+# Путь к нашему новому классу (замени 'catnet_project' на имя твоей папки с settings)
+EMAIL_BACKEND = 'catnet_project.email_backend.ResendApiBackend'
+
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+# Важно: Resend на бесплатном тарифе требует этот адрес, если домен не привязан:
+DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
 
 # Настройки Allauth
 AUTHENTICATION_BACKENDS = [
@@ -139,15 +137,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Это поможет Django корректно работать с файлами на сервере
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Настройки CSP
-CSP_DEFAULT_SRC = ("'self'",)
-# Разрешаем скрипты (включая 'unsafe-eval' для анимаций Lottie)
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "https://unpkg.com", "https://cdn.jsdelivr.net", "https://lottie.host")
-# Разрешаем стили
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com")
-# Разрешаем шрифты
-CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com")
-# Разрешаем картинки (и твои лапки на фоне)
-CSP_IMG_SRC = ("'self'", "data:", "https://www.transparenttextures.com")
-# Разрешаем подключение к Supabase (WebSockets)
-CSP_CONNECT_SRC = ("'self'", "https://*.supabase.co", "wss://*.supabase.co")
+CSP_SCRIPT_SRC = (
+    "'self'", 
+    "'unsafe-inline'", 
+    "'unsafe-eval'",  # Обязательно!
+    "https://unpkg.com", 
+    "https://cdn.jsdelivr.net"
+)
