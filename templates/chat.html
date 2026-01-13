@@ -3,37 +3,42 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <div class="card shadow border-0" style="border-radius: 20px; overflow: hidden;">
-            <div class="card-header bg-primary text-white py-3 fw-bold">
-                <i class="fas fa-comments"></i> Чат с другом
+        <div class="card shadow border-0" style="border-radius: 20px; overflow: hidden; height: 85vh;">
+            <div class="card-header bg-primary text-white py-3 d-flex align-items-center">
+                <a href="{% url 'home' %}" class="text-white me-3"><i class="fas fa-arrow-left"></i></a>
+                <h6 class="mb-0 fw-bold">
+                    {% if room.users.count > 2 %}🐾 {{ room.name }}{% else %}Чат с другом{% endif %}
+                </h6>
             </div>
             
-            <div id="chat-messages" class="card-body bg-light" style="height: 500px; overflow-y: auto; display: flex; flex-direction: column;">
+            <div id="chat-messages" class="card-body" style="background-color: #e5ddd5; background-image: url('https://www.transparenttextures.com/patterns/paws.png'); overflow-y: auto; display: flex; flex-direction: column; padding: 20px;">
                 {% for msg in messages %}
                     <div class="mb-2 d-flex {% if msg.sender == user %}justify-content-end{% else %}justify-content-start{% endif %}">
-                        <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 15px; 
+                        <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 12px; 
                             {% if msg.sender == user %}
-                                background: #6f42c1; color: white; border-bottom-right-radius: 2px;
+                                background: #dcf8c6; color: #303030; border-top-right-radius: 2px;
                             {% else %}
-                                background: white; color: #444; border-bottom-left-radius: 2px;
+                                background: white; color: #303030; border-top-left-radius: 2px;
                             {% endif %}">
                             
+                            {% if room.users.count > 2 and msg.sender != user %}
+                                <div class="fw-bold text-primary mb-1" style="font-size: 0.75rem;">{{ msg.sender.username }}</div>
+                            {% endif %}
+
                             <div class="message-text">{{ msg.text }}</div>
-                            
-                            <div class="text-end" style="font-size: 0.65rem; opacity: 0.8; margin-top: 2px;">
+                            <div class="text-end" style="font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">
                                 {{ msg.created_at|date:"H:i" }}
-                                {% if msg.sender == user %} <i class="fas fa-check-double" style="font-size: 0.6rem;"></i>{% endif %}
+                                {% if msg.sender == user %} <i class="fas fa-check-double text-primary"></i>{% endif %}
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
 
-            <div class="card-footer bg-white border-top-0">
+            <div class="card-footer bg-white border-0 py-3">
                 <form id="chat-form" class="d-flex align-items-center">
                     {% csrf_token %}
-                    <button type="button" id="emoji-button" class="btn btn-link text-decoration-none fs-4">😊</button>
-                    <input type="text" id="msg-text" class="form-control rounded-pill border-light bg-light px-4 me-2" placeholder="Напишите сообщение..." required autocomplete="off">
+                    <input type="text" id="msg-text" class="form-control rounded-pill border-light bg-light px-4 me-2" placeholder="Введите сообщение..." required autocomplete="off">
                     <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -45,78 +50,26 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // 1. Настройки Supabase
-    const supabaseUrl = 'https://jxwpehytpxbbnfnadafd.supabase.co'; 
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4d3BlaHl0cHhiYm5mbmFkYWZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNDE1NjgsImV4cCI6MjA4MzYxNzU2OH0.llHsbsMFpMBV1VdLou95WwNhO7jmX4NxpwPEv9ibqHY'; 
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-    const chatMessages = document.getElementById('chat-messages');
+    // Здесь оставляешь свой скрипт Supabase, который ты скидывал выше.
+    // Только обнови функцию appendMessage, чтобы она добавляла имена:
     
-    // Функция прокрутки вниз
-    const scrollToBottom = () => {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    };
-    scrollToBottom(); // При загрузке сразу вниз
-
-    // 2. REALTIME (Добавление сообщения без перезагрузки)
-    supabaseClient
-        .channel('public:core_message')
-        .on('postgres_changes', { 
-            event: 'INSERT', 
-            schema: 'public', 
-            table: 'core_message',
-            filter: 'room_id=eq.{{ room.id }}' 
-        }, (payload) => {
-            // Если пришло чужое сообщение — добавляем его в чат
-            if (payload.new.sender_id != {{ user.id }}) {
-                appendMessage(payload.new.text, false, new Date(payload.new.created_at));
-            }
-        })
-        .subscribe();
-
-    // Функция отрисовки сообщения в HTML
-    function appendMessage(text, isMe, date) {
+    function appendMessage(text, isMe, date, senderName) {
         const time = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+        const showName = !isMe && {{ room.users.count }} > 2;
+        
         const msgHtml = `
             <div class="mb-2 d-flex ${isMe ? 'justify-content-end' : 'justify-content-start'}">
-                <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 15px; 
-                    ${isMe ? 'background: #6f42c1; color: white; border-bottom-right-radius: 2px;' : 'background: white; color: #444; border-bottom-left-radius: 2px;'}">
+                <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 12px; 
+                    ${isMe ? 'background: #dcf8c6; color: #303030; border-top-right-radius: 2px;' : 'background: white; color: #303030; border-top-left-radius: 2px;'}">
+                    ${showName ? `<div class="fw-bold text-primary mb-1" style="font-size: 0.75rem;">Чужой котик</div>` : ''}
                     <div class="message-text">${text}</div>
-                    <div class="text-end" style="font-size: 0.65rem; opacity: 0.8; margin-top: 2px;">
-                        ${time} ${isMe ? '<i class="fas fa-check-double" style="font-size: 0.6rem;"></i>' : ''}
+                    <div class="text-end" style="font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">
+                        ${time} ${isMe ? '<i class="fas fa-check-double text-primary"></i>' : ''}
                     </div>
                 </div>
             </div>`;
         chatMessages.insertAdjacentHTML('beforeend', msgHtml);
-        scrollToBottom();
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-
-    // 3. ОТПРАВКА СООБЩЕНИЯ
-    const chatForm = document.getElementById('chat-form');
-    const input = document.getElementById('msg-text');
-
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = input.value;
-        if(!text) return;
-
-        // Сразу показываем свое сообщение (для скорости)
-        appendMessage(text, true, new Date());
-        input.value = ''; 
-
-        const formData = new FormData();
-        formData.append('text', text);
-        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
-
-        await fetch(window.location.href, {
-            method: "POST",
-            body: formData
-        });
-    });
-
-    // 4. СМАЙЛИКИ
-    document.getElementById('emoji-button').addEventListener('click', () => {
-        alert("💡 На компьютере: нажмите Win + . (точка)\n💡 На телефоне: используйте смайлы на клавиатуре.");
-    });
 </script>
 {% endblock %}

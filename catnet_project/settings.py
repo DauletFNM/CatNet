@@ -144,3 +144,9 @@ CSP_SCRIPT_SRC = (
     "https://unpkg.com", 
     "https://cdn.jsdelivr.net"
 )
+
+import os
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Django будет искать файлы здесь
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Сюда соберутся файлы для Render

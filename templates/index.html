@@ -2,49 +2,54 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 text-center">
-        {% if not user.is_authenticated %}
-            <div class="card p-5 mt-5 shadow-lg border-0">
-                <h1 class="display-4 fw-bold mb-3">🐱 CatNet 2.0</h1>
-                <p class="lead text-muted mb-5">Мессенджер для общения текстом.</p>
-                
-                <div class="d-grid gap-3 col-6 mx-auto">
-                    <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
-                        Войти в аккаунт
-                    </a>
-                    
-                    <a href="{% url 'account_signup' %}" class="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
-                        Создать профиль
-                    </a>
-
-                    <div class="position-relative my-4">
-                        <hr>
-                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">или</span>
-                    </div>
-
-                    <form method="post" action="{% url 'google_login' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger btn-lg rounded-pill shadow-sm w-100">
-                            <i class="bi bi-google"></i> Войти через Google
-                        </button>
-                    </form>
-                </div>
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-primary">Мои чаты</h5>
+                <a href="{% url 'user_search' %}" class="btn btn-primary btn-sm rounded-pill px-3">🔍 Найти</a>
             </div>
-        {% else %}
-            <div class="card p-4 text-start">
-                <h3 class="mb-4">Твои друзья</h3>
-                <div class="list-group">
-                    {% for friend in friends %}
-                        <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 border-0 shadow-sm">
-                            <span class="fw-bold">{{ friend.username }}</span>
-                            <a href="{% url 'start_chat' friend.id %}" class="btn btn-sm btn-primary px-4 rounded-pill">Написать</a>
+            
+            <div class="list-group list-group-flush">
+                {% for room in chatrooms %}
+                    <a href="{% url 'chat_room' room.id %}" class="list-group-item list-group-item-action py-3 border-0 border-bottom px-4">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white me-3 shadow-sm" 
+                                 style="width: 55px; height: 55px; background: linear-gradient(135deg, #6f42c1, #a259ff); min-width: 55px;">
+                                {% if room.users.count > 2 %}
+                                    <i class="fas fa-users fs-4"></i>
+                                {% else %}
+                                    <i class="fas fa-cat fs-4"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0 fw-bold">
+                                        {% if room.users.count > 2 %}
+                                            🐾 {{ room.name }}
+                                        {% else %}
+                                            {% for u in room.users.all %}{% if u != user %}{{ u.username }}{% endif %}{% endfor %}
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">{% if room.messages.last %}{{ room.messages.last.created_at|date:"H:i" }}{% endif %}</small>
+                                </div>
+                                <div class="text-muted small text-truncate">
+                                    {% if room.messages.last %}
+                                        <strong>{{ room.messages.last.sender.username }}:</strong> {{ room.messages.last.text }}
+                                    {% else %}
+                                        <span class="fst-italic text-opacity-50">Нет сообщений</span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-                    {% empty %}
-                        <p class="text-muted">У тебя пока нет друзей. Попробуй найти кого-нибудь!</p>
-                    {% endfor %}
-                </div>
+                    </a>
+                {% empty %}
+                    <div class="p-5 text-center">
+                        <p class="text-muted">Чатов пока нет. Начните общаться с друзьями!</p>
+                    </div>
+                {% endfor %}
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

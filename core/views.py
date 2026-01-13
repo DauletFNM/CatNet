@@ -2,6 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import FriendRequest, ChatRoom, Message
+from django.contrib.auth.decorators import login_required
+from django.db.models import Max
+from django.http import JsonResponse
+
+
 
 # Функция для поиска людей
 def user_search(request):
@@ -16,18 +21,24 @@ def send_friend_request(request, user_id):
     return redirect('user_search')
 
 def home(request):
-    # Если пользователь не вошел, просто показываем страницу
     if not request.user.is_authenticated:
         return render(request, 'index.html')
     
-    # Получаем список друзей (те, кто принял запрос)
+    # Получаем все комнаты пользователя и сортируем по последнему сообщению
+    chatrooms = ChatRoom.objects.filter(users=request.user).annotate(
+        last_msg_time=Max('messages__created_at')
+    ).order_by('-last_msg_time')
+
+    # Список друзей для создания новых чатов
     friends = User.objects.filter(
         Q(received_requests__from_user=request.user, received_requests__accepted=True) |
         Q(sent_requests__to_user=request.user, sent_requests__accepted=True)
     ).distinct()
 
-    return render(request, 'index.html', {'friends': friends})
-
+    return render(request, 'index.html', {
+        'chatrooms': chatrooms,
+        'friends': friends
+    })
 # Показать список входящих запросов
 def friend_requests(request):
     requests = FriendRequest.objects.filter(to_user=request.user, accepted=False)
@@ -54,14 +65,18 @@ def start_chat(request, user_id):
     
     return redirect('chat_room', room_id=room.id)
 
+@login_required
 def chat_room(request, room_id):
     room = get_object_or_404(ChatRoom, id=room_id, users=request.user)
-    messages = room.messages.all()
+    messages = room.messages.all().select_related('sender') # Оптимизация для имен
     
     if request.method == 'POST':
         text = request.POST.get('text')
         if text:
             Message.objects.create(room=room, sender=request.user, text=text)
+            # При POST запросе через Fetch (JS) возвращаем пустой ответ или статус
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'status': 'ok'})
             return redirect('chat_room', room_id=room.id)
             
     return render(request, 'chat.html', {'room': room, 'messages': messages})
