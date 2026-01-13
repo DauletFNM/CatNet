@@ -1,6 +1,74 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+    /* Переменные для адаптации под твою темную тему из base.html */
+    :root {
+        --chat-bg-color: #e5ddd5;
+        --chat-paws-opacity: 1;
+        --msg-in-bg: #ffffff;
+        --msg-out-bg: #dcf8c6;
+        --msg-text-color: #303030;
+        --footer-bg: #ffffff;
+    }
+
+    /* Когда в base.html включается dark-mode */
+    body.dark-mode {
+        --chat-bg-color: #111b21;
+        --chat-paws-opacity: 0.4; /* На темном фоне лапки делаем тусклее */
+        --msg-in-bg: #202c33;
+        --msg-out-bg: #005c4b;
+        --msg-text-color: #e9edef;
+        --footer-bg: #1a1a1b;
+    }
+
+    #chat-messages {
+        background-color: var(--chat-bg-color) !important;
+        /* Фон с лапками */
+        background-image: url('https://www.transparenttextures.com/patterns/paws.png');
+        background-attachment: fixed;
+        height: 500px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    .message-bubble {
+        max-width: 75%;
+        border-radius: 12px;
+        padding: 8px 12px;
+        color: var(--msg-text-color) !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .msg-sent {
+        background-color: var(--msg-out-bg) !important;
+        border-top-right-radius: 2px;
+        align-self: flex-end;
+    }
+
+    .msg-received {
+        background-color: var(--msg-in-bg) !important;
+        border-top-left-radius: 2px;
+        align-self: flex-start;
+    }
+
+    .card-footer {
+        background-color: var(--footer-bg) !important;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Чтобы инпут тоже был темным */
+    body.dark-mode #msg-text {
+        background-color: #2a2a2b !important;
+        border-color: #3d3d3e !important;
+        color: white !important;
+    }
+</style>
+
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow border-0" style="border-radius: 20px; overflow: hidden; height: 85vh;">
@@ -11,15 +79,10 @@
                 </h6>
             </div>
             
-            <div id="chat-messages" class="card-body" style="background-color: #e5ddd5; background-image: url('https://www.transparenttextures.com/patterns/paws.png'); overflow-y: auto; display: flex; flex-direction: column; padding: 20px;">
+            <div id="chat-messages">
                 {% for msg in messages %}
                     <div class="mb-2 d-flex {% if msg.sender == user %}justify-content-end{% else %}justify-content-start{% endif %}">
-                        <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 12px; 
-                            {% if msg.sender == user %}
-                                background: #dcf8c6; color: #303030; border-top-right-radius: 2px;
-                            {% else %}
-                                background: white; color: #303030; border-top-left-radius: 2px;
-                            {% endif %}">
+                        <div class="message-bubble {% if msg.sender == user %}msg-sent{% else %}msg-received{% endif %}">
                             
                             {% if room.users.count > 2 and msg.sender != user %}
                                 <div class="fw-bold text-primary mb-1" style="font-size: 0.75rem;">{{ msg.sender.username }}</div>
@@ -35,10 +98,10 @@
                 {% endfor %}
             </div>
 
-            <div class="card-footer bg-white border-0 py-3">
+            <div class="card-footer py-3">
                 <form id="chat-form" class="d-flex align-items-center">
                     {% csrf_token %}
-                    <input type="text" id="msg-text" class="form-control rounded-pill border-light bg-light px-4 me-2" placeholder="Введите сообщение..." required autocomplete="off">
+                    <input type="text" id="msg-text" class="form-control rounded-pill px-4 me-2" placeholder="Введите сообщение..." required autocomplete="off">
                     <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
                         <i class="fas fa-paper-plane"></i>
                     </button>
@@ -50,18 +113,39 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-    // Здесь оставляешь свой скрипт Supabase, который ты скидывал выше.
-    // Только обнови функцию appendMessage, чтобы она добавляла имена:
-    
-    function appendMessage(text, isMe, date, senderName) {
+    const supabaseUrl = 'https://jxwpehytpxbbnfnadafd.supabase.co'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4d3BlaHl0cHhiYm5mbmFkYWZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNDE1NjgsImV4cCI6MjA4MzYxNzU2OH0.llHsbsMFpMBV1VdLou95WwNhO7jmX4NxpwPEv9ibqHY'; 
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const chatMessages = document.getElementById('chat-messages');
+    const scrollToBottom = () => { chatMessages.scrollTop = chatMessages.scrollHeight; };
+    scrollToBottom();
+
+    // REALTIME
+    supabaseClient
+        .channel('public:core_message')
+        .on('postgres_changes', { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'core_message',
+            filter: 'room_id=eq.{{ room.id }}' 
+        }, (payload) => {
+            if (payload.new.sender_id != {{ user.id }}) {
+                // В групповом чате сложно получить имя через JS сразу, 
+                // поэтому пока оставим "Друг", если не заморачиваться с API
+                appendMessage(payload.new.text, false, new Date(payload.new.created_at));
+            }
+        })
+        .subscribe();
+
+    function appendMessage(text, isMe, date) {
         const time = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
         const showName = !isMe && {{ room.users.count }} > 2;
         
         const msgHtml = `
             <div class="mb-2 d-flex ${isMe ? 'justify-content-end' : 'justify-content-start'}">
-                <div class="p-2 px-3 shadow-sm" style="max-width: 75%; border-radius: 12px; 
-                    ${isMe ? 'background: #dcf8c6; color: #303030; border-top-right-radius: 2px;' : 'background: white; color: #303030; border-top-left-radius: 2px;'}">
-                    ${showName ? `<div class="fw-bold text-primary mb-1" style="font-size: 0.75rem;">Чужой котик</div>` : ''}
+                <div class="message-bubble ${isMe ? 'msg-sent' : 'msg-received'}">
+                    ${showName ? `<div class="fw-bold text-primary mb-1" style="font-size: 0.75rem;">Котик</div>` : ''}
                     <div class="message-text">${text}</div>
                     <div class="text-end" style="font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">
                         ${time} ${isMe ? '<i class="fas fa-check-double text-primary"></i>' : ''}
@@ -69,7 +153,30 @@
                 </div>
             </div>`;
         chatMessages.insertAdjacentHTML('beforeend', msgHtml);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
     }
+
+    // Отправка
+    const chatForm = document.getElementById('chat-form');
+    const input = document.getElementById('msg-text');
+
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = input.value;
+        if(!text) return;
+
+        appendMessage(text, true, new Date());
+        input.value = ''; 
+
+        const formData = new FormData();
+        formData.append('text', text);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        await fetch(window.location.href, {
+            method: "POST",
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+    });
 </script>
 {% endblock %}
