@@ -11,15 +11,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.1/dist/dotlottie-player.mjs" type="module"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <style>
         /* --- ПЕРЕМЕННЫЕ ДЛЯ ТЕМ --- */
         :root {
             --bg-color: #f0f2f5;
             --text-color: #444;
-            --card-bg: rgba(255, 255, 255, 0.85); /* Полупрозрачный для эффекта стекла */
+            --card-bg: rgba(255, 255, 255, 0.85);
             --nav-gradient: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%);
-            --overlay-opacity: 0.6; /* Насколько видна картинка (чем меньше, тем четче картинка) */
+            --overlay-opacity: 0.6;
         }
 
         body.dark-mode {
@@ -27,13 +29,11 @@
             --text-color: #f0f0f0;
             --card-bg: rgba(45, 45, 46, 0.85);
             --nav-gradient: linear-gradient(135deg, #4b2c85 0%, #6f42c1 100%);
-            --overlay-opacity: 0.8; /* В темной теме картинку лучше приглушить */
+            --overlay-opacity: 0.8;
         }
 
-        /* --- ОСНОВНОЙ ФОН --- */
         body { 
             background-color: var(--bg-color); 
-            /* Твоя картинка (убедись, что файл лежит в static и называется bg.jpg) */
             background-image: url("{% static 'bg.jpg' %}");
             background-size: cover;
             background-position: center;
@@ -46,7 +46,6 @@
             position: relative;
         }
 
-        /* Слой тонировки поверх картинки */
         body::before {
             content: "";
             position: fixed;
@@ -58,7 +57,6 @@
             transition: background-color 0.3s ease, opacity 0.3s ease;
         }
 
-        /* --- ЭЛЕМЕНТЫ ИНТЕРФЕЙСА --- */
         .navbar { 
             background: var(--nav-gradient) !important; 
             box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
@@ -71,7 +69,7 @@
             border: none !important; 
             border-radius: 20px; 
             background: var(--card-bg) !important;
-            backdrop-filter: blur(10px); /* Тот самый эффект матового стекла */
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
             color: var(--text-color) !important;
@@ -92,7 +90,6 @@
             box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
         }
 
-        /* Анимация вращения луны/солнца */
         #theme-toggle i { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-effect { transform: rotate(360deg); }
 
@@ -104,9 +101,26 @@
         }
 
         .nav-link:hover { color: #ffc107 !important; }
+
+        /* СТИЛЬ ДЛЯ КАРТИНОК ШЛЕЙФА */
+        .flair {
+            position: fixed;
+            pointer-events: none; /* Чтобы не мешало кликать на кнопки */
+            z-index: 10000;
+            width: 40px; 
+            height: 40px;
+            opacity: 0;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
+    <div id="trail-container">
+        {% for i in "1234567890" %}
+            <img src="{% static 'catwalk.png' %}" class="flair" alt="cat">
+        {% endfor %}
+    </div>
+
     <div class="cat-loader">
         <dotlottie-player 
             src="{% static 'cat_animation.json' %}" 
@@ -169,24 +183,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Настройки темы
         const themeBtn = document.getElementById('theme-toggle');
         const icon = themeBtn.querySelector('i');
         const body = document.body;
 
-        // При загрузке страницы восстанавливаем тему
         if (localStorage.getItem('theme') === 'dark') {
             body.classList.add('dark-mode');
             icon.classList.replace('fa-moon', 'fa-sun');
         }
 
         themeBtn.addEventListener('click', () => {
-            // Анимация вращения
             icon.classList.add('rotate-effect');
             setTimeout(() => icon.classList.remove('rotate-effect'), 600);
-
-            // Переключение темы
             body.classList.toggle('dark-mode');
-            
             if (body.classList.contains('dark-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
                 localStorage.setItem('theme', 'dark');
@@ -195,6 +205,65 @@
                 localStorage.setItem('theme', 'light');
             }
         });
+
+        // ЛОГИКА ШЛЕЙФА МЫШИ
+        let flair = gsap.utils.toArray(".flair");
+        let gap = 50; 
+        let index = 0;
+        let wrapper = gsap.utils.wrap(0, flair.length);
+
+        let mousePos = { x: 0, y: 0 };
+        let lastMousePos = { x: 0, y: 0 };
+
+        window.addEventListener("mousemove", (e) => {
+            mousePos = { x: e.clientX, y: e.clientY };
+            
+            let travelDistance = Math.hypot(
+                lastMousePos.x - mousePos.x,
+                lastMousePos.y - mousePos.y
+            );
+
+            if (travelDistance > gap) {
+                animateImage();
+                lastMousePos = { x: mousePos.x, y: mousePos.y };
+            }
+        });
+
+        function animateImage() {
+            let wrappedIndex = wrapper(index);
+            let img = flair[wrappedIndex];
+            
+            gsap.killTweensOf(img);
+            
+            gsap.set(img, {
+                opacity: 1,
+                scale: 0,
+                left: mousePos.x,
+                top: mousePos.y,
+                xPercent: -50,
+                yPercent: -50,
+                rotation: gsap.utils.random(-30, 30)
+            });
+
+            playAnimation(img);
+            index++;
+        }
+
+        function playAnimation(shape) {
+            let tl = gsap.timeline();
+            tl.to(shape, {
+                opacity: 1,
+                scale: 1.2,
+                duration: 0.3,
+                ease: "back.out(1.7)"
+            })
+            .to(shape, {
+                opacity: 0,
+                scale: 0.5,
+                duration: 0.5,
+                delay: 0.2
+            });
+        }
     </script>
 </body>
 </html>
