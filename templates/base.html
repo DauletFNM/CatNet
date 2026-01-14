@@ -10,30 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
     
-    <script src="https://unpkg.com/@dotlottie/player-component@2.7.1/dist/dotlottie-player.mjs" type="module"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@2.7.1/dist/dotlottie-player.mjs" type="module"></script>
 
     <style>
-        .btn-animate {
-    font-family: 'Comfortaa', cursive;
-    color: #ffffff;
-    background: radial-gradient(129% 99% at 120% 81%, #6f42c1 30%, #a259ff 100%);
-    background-blend-mode: color-dodge;
-    font-weight: 600;
-    border: none;
-    border-radius: 99px;
-    padding: 12px 35px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.btn-animate:active {
-    transform: scale(0.95);
-}
-        /* --- ПЕРЕМЕННЫЕ ДЛЯ ТЕМ --- */
         :root {
             --bg-color: #f0f2f5;
             --text-color: #444;
@@ -60,265 +41,114 @@
             color: var(--text-color);
             min-height: 100vh;
             margin: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            position: relative;
+            overflow-x: hidden; /* Чтобы не было полосы прокрутки, когда кошка за краем */
         }
 
-        body::before {
-            content: "";
+        /* --- СТИЛЬ ДЛЯ ВЕДЬМЫ --- */
+        #witch-cat-global {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            opacity: var(--overlay-opacity);
-            z-index: -1;
+            bottom: 30px;
+            right: -150px; /* Спрятана за правым краем */
+            z-index: 9999;
             pointer-events: none;
-            transition: background-color 0.3s ease, opacity 0.3s ease;
         }
 
-        .navbar { 
-            background: var(--nav-gradient) !important; 
-            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-        }
-
-        .navbar-brand { font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-
-        .card { 
-            border: none !important; 
-            border-radius: 20px; 
-            background: var(--card-bg) !important;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1); 
-            color: var(--text-color) !important;
-            transition: transform 0.3s ease;
-        }
-
-        .btn-primary { 
-            background: #6f42c1; 
-            border: none; 
-            border-radius: 50px; 
-            padding: 10px 25px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
-        }
-
-        #theme-toggle i { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .rotate-effect { transform: rotate(360deg); }
-
-        .cat-loader {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: -20px;
-        }
-
-        .nav-link:hover { color: #ffc107 !important; }
-
-        /* СТИЛЬ ДЛЯ КАРТИНОК ШЛЕЙФА */
         .flair {
             position: fixed;
-            pointer-events: none; /* Чтобы не мешало кликать на кнопки */
+            pointer-events: none;
             z-index: 10000;
-            width: 40px; 
-            height: 40px;
+            width: 35px; 
+            height: 35px;
             opacity: 0;
-            user-select: none;
         }
     </style>
 </head>
 <body>
-    <div id="trail-container">
-        {% for i in "1234567890" %}
-            <img src="{% static 'catwalk.png' %}" class="flair" alt="cat">
-        {% endfor %}
-    </div>
 
-    <div class="cat-loader">
+    <div id="witch-cat-global">
         <dotlottie-player 
-            src="{% static 'cat_animation.json' %}" 
+            src="{% static 'witch_cat.json' %}" 
             background="transparent" 
             speed="1" 
-            style="width: 200px; height: 200px;" 
-            loop 
-            autoplay>
-        </dotlottie-player> 
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">🐾 CatNet </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav ms-auto align-items-center">
-                    <button id="theme-toggle" class="btn btn-link nav-link px-3 text-white border-0 shadow-none">
-                        <i class="fas fa-moon fs-5"></i>
-                    </button>
-
-                    {% if user.is_authenticated %}
-                        <a class="nav-link px-3" href="{% url 'user_search' %}">🔍 Поиск</a>
-                        <a class="nav-link px-3" href="{% url 'friend_requests' %}">
-                            <i class="fas fa-bell"></i> Уведомления
-                            {% if friend_requests_count %}
-                                <span class="badge bg-danger rounded-pill">{{ friend_requests_count }}</span>
-                            {% endif %}
-                        </a>
-                        <a class="nav-link text-warning fw-bold px-3" href="{% url 'account_logout' %}">🚪 Выйти ({{ user.username }})</a>
-                    {% else %}
-                        <a class="nav-link px-3" href="{% url 'account_login' %}">Вход</a>
-                        <a class="nav-link px-3" href="{% url 'account_signup' %}">Регистрация</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container pb-5">
-        {% block content %}
-        {% endblock %}
-    </div>
-
-    <div style="position: fixed; bottom: 10px; left: 10px; z-index: -1; opacity: 0.4; pointer-events: none;">
-        <dotlottie-player 
-            src="{% static 'cat_animation.json' %}" 
-            background="transparent" 
-            speed="0.5" 
             style="width: 120px; height: 120px;" 
             loop 
             autoplay>
         </dotlottie-player>
     </div>
 
+    <div id="trail-container">
+        {% for i in "1234567890" %}
+            <img src="{% static 'catwalk.png' %}" class="flair" alt="cat">
+        {% endfor %}
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">🐾 CatNet </a>
+            <div class="navbar-nav ms-auto flex-row">
+                <button id="theme-toggle" class="btn btn-link nav-link text-white border-0 shadow-none">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Настройки темы
+        // --- АНИМАЦИЯ ВЕДЬМЫ (Патруль каждые 10 секунд) ---
+        function startGlobalWitch() {
+            const witch = document.getElementById('witch-cat-global');
+            // Создаем бесконечный цикл: идет влево 8 сек -> пауза 10 сек -> повтор
+            const tl = gsap.timeline({ repeat: -1, repeatDelay: 10 });
+
+            tl.to(witch, {
+                x: -(window.innerWidth + 300), 
+                duration: 10, 
+                ease: "none"
+            });
+        }
+
+        // --- ЛОГИКА ТЕМЫ ---
         const themeBtn = document.getElementById('theme-toggle');
         const icon = themeBtn.querySelector('i');
-        const body = document.body;
-
+        
         if (localStorage.getItem('theme') === 'dark') {
-            body.classList.add('dark-mode');
+            document.body.classList.add('dark-mode');
             icon.classList.replace('fa-moon', 'fa-sun');
         }
 
         themeBtn.addEventListener('click', () => {
-            icon.classList.add('rotate-effect');
-            setTimeout(() => icon.classList.remove('rotate-effect'), 600);
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
-                localStorage.setItem('theme', 'light');
-            }
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            icon.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
-        // ЛОГИКА ШЛЕЙФА МЫШИ
+        // --- ШЛЕЙФ МЫШКИ ---
         let flair = gsap.utils.toArray(".flair");
-        let gap = 50; 
         let index = 0;
-        let wrapper = gsap.utils.wrap(0, flair.length);
-
-        let mousePos = { x: 0, y: 0 };
-        let lastMousePos = { x: 0, y: 0 };
+        let lastPos = { x: 0, y: 0 };
 
         window.addEventListener("mousemove", (e) => {
-            mousePos = { x: e.clientX, y: e.clientY };
-            
-            let travelDistance = Math.hypot(
-                lastMousePos.x - mousePos.x,
-                lastMousePos.y - mousePos.y
-            );
-
-            if (travelDistance > gap) {
-                animateImage();
-                lastMousePos = { x: mousePos.x, y: mousePos.y };
+            if (Math.hypot(e.clientX - lastPos.x, e.clientY - lastPos.y) > 45) {
+                let img = flair[index % flair.length];
+                index++;
+                gsap.set(img, { x: e.clientX, y: e.clientY, scale: 0, opacity: 1, xPercent: -50, yPercent: -50 });
+                gsap.timeline()
+                    .to(img, { scale: 1, duration: 0.3 })
+                    .to(img, { scale: 0, opacity: 0, duration: 0.6 }, "+=0.2");
+                lastPos = { x: e.clientX, y: e.clientY };
             }
         });
 
-        function animateImage() {
-            let wrappedIndex = wrapper(index);
-            let img = flair[wrappedIndex];
-            
-            gsap.killTweensOf(img);
-            
-            gsap.set(img, {
-                opacity: 1,
-                scale: 0,
-                left: mousePos.x,
-                top: mousePos.y,
-                xPercent: -50,
-                yPercent: -50,
-                rotation: gsap.utils.random(-30, 30)
-            });
-
-            playAnimation(img);
-            index++;
-        }
-
-        function playAnimation(shape) {
-            let tl = gsap.timeline();
-            tl.to(shape, {
-                opacity: 1,
-                scale: 1.2,
-                duration: 0.3,
-                ease: "back.out(1.7)"
-            })
-            .to(shape, {
-                opacity: 0,
-                scale: 0.5,
-                duration: 0.5,
-                delay: 0.2
-            });
-        }
+        // Запуск ведьмы при загрузке любой страницы
+        window.addEventListener('load', startGlobalWitch);
     </script>
-    <script>
-    gsap.registerPlugin(TextPlugin);
-
-    // Функция для запуска анимации на любой кнопке с классом .btn-animate
-    document.querySelectorAll('.btn-animate').forEach(btn => {
-        const btnTL = gsap.timeline({ paused: true })
-            .to(btn, {
-                duration: 0.8,
-                text: { value: 'Отправка...', type: 'diff' },
-                ease: 'sine.in'
-            })
-            .to(btn, {
-                duration: 0.6,
-                text: { value: 'Отправка', type: 'diff' },
-                ease: 'sine.inOut',
-                repeat: 3,
-                yoyo: true
-            })
-            .to(btn, {
-                text: 'Готово!',
-                ease: 'none'
-            }, "+=0.3");
-
-        btn.addEventListener('click', function(e) {
-            // Запускаем анимацию
-            btnTL.play(0);
-            
-            // Если это кнопка внутри формы, она отправится через 2 секунды
-            if (this.type === 'submit') {
-                const form = this.closest('form');
-                setTimeout(() => {
-                    form.submit();
-                }, 2500); // Задержка, чтобы успела проиграться анимация
-            }
-        });
-    });
-</script>
 </body>
 </html>
