@@ -97,14 +97,13 @@
             user-select: none;
         }
 
-        /* Ведьма-кошка */
-        #witch-cat-global {
-            position: fixed;
-            bottom: 20px;
-            right: -150px;
-            z-index: 9998;
-            pointer-events: none;
-        }
+       #witch-cat-global {
+    position: fixed;
+    top: 50%; /* Поставим временно по центру высоты, чтобы точно увидеть */
+    right: -150px;
+    z-index: 9999;
+    pointer-events: none;
+}
 
         #theme-toggle i { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-effect { transform: rotate(360deg); }
