@@ -17,9 +17,10 @@
             {% for u in users %}
                 <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-0 border-bottom">
                     <div class="d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
-                            <i class="fas fa-cat"></i>
-                        </div>
+                        <img src="{{ u.profile.avatar_url }}" 
+                             alt="{{ u.username }}" 
+                             class="rounded-circle me-3 shadow-sm" 
+                             style="width: 45px; height: 45px; object-fit: cover;">
                         <span class="fw-bold">{{ u.username }}</span>
                     </div>
                     <div class="d-flex gap-2">

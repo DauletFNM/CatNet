@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q, Max
-from .models import FriendRequest, ChatRoom, Message
+from .models import FriendRequest, ChatRoom, Message, UserProfile, AVATARS
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 @login_required
 def home(request):
@@ -71,3 +72,38 @@ def chat_room(request, room_id):
             return redirect('chat_room', room_id=room.id)
             
     return render(request, 'chat.html', {'room': room, 'messages': messages})
+
+@login_required
+def profile(request):
+    """Профиль пользователя с изменением имени и аватара"""
+    profile = request.user.profile
+    
+    if request.method == 'POST':
+        # Обновляем имя пользователя
+        username = request.POST.get('username', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        avatar_url = request.POST.get('avatar_url', '')
+        
+        if username and username != request.user.username:
+            if User.objects.filter(username=username).exclude(id=request.user.id).exists():
+                return render(request, 'profile.html', {
+                    'avatars': AVATARS,
+                    'error': 'Это имя уже занято!'
+                })
+            request.user.username = username
+        
+        if first_name:
+            request.user.first_name = first_name
+        
+        if avatar_url in [url for url, _ in AVATARS]:
+            profile.avatar_url = avatar_url
+        
+        request.user.save()
+        profile.save()
+        
+        return redirect('profile')
+    
+    return render(request, 'profile.html', {
+        'avatars': AVATARS,
+        'profile': profile
+    })

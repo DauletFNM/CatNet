@@ -13,14 +13,21 @@
                 {% for room in chatrooms %}
                     <a href="{% url 'chat_room' room.id %}" class="list-group-item list-group-item-action py-3 border-0 border-bottom px-4">
                         <div class="d-flex align-items-center">
-                            <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white me-3 shadow-sm" 
-                                 style="width: 55px; height: 55px; background: linear-gradient(135deg, #6f42c1, #a259ff); min-width: 55px;">
-                                {% if room.users.count > 2 %}
+                            {% if room.users.count > 2 %}
+                                <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white me-3 shadow-sm" 
+                                     style="width: 55px; height: 55px; background: linear-gradient(135deg, #6f42c1, #a259ff); min-width: 55px;">
                                     <i class="fas fa-users fs-4"></i>
-                                {% else %}
-                                    <i class="fas fa-cat fs-4"></i>
-                                {% endif %}
-                            </div>
+                                </div>
+                            {% else %}
+                                {% for u in room.users.all %}
+                                    {% if u != user %}
+                                        <img src="{{ u.profile.avatar_url }}" 
+                                             alt="{{ u.username }}" 
+                                             class="rounded-circle me-3 shadow-sm" 
+                                             style="width: 55px; height: 55px; object-fit: cover; min-width: 55px;">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                             
                             <div class="flex-grow-1 overflow-hidden">
                                 <div class="d-flex justify-content-between align-items-center mb-1">

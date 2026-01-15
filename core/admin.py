@@ -1,5 +1,16 @@
 from django.contrib import admin
-from .models import ChatRoom, Message, FriendRequest
+from .models import ChatRoom, Message, FriendRequest, UserProfile
+
+# Настройка отображения профилей
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'avatar_display', 'created_at')
+    search_fields = ('user__username',)
+    
+    def avatar_display(self, obj):
+        return f'<img src="{obj.avatar_url}" width="50" height="50" style="border-radius: 50%; object-fit: cover;" />'
+    avatar_display.allow_tags = True
+    avatar_display.short_description = "Аватар"
 
 # Настройка отображения друзей
 @admin.register(FriendRequest)

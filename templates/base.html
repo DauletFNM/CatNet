@@ -159,6 +159,7 @@
                                 <span class="badge bg-danger rounded-pill">{{ friend_requests_count }}</span>
                             {% endif %}
                         </a>
+                        <a class="nav-link px-3" href="{% url 'profile' %}">👤 Профиль</a>
                         <a class="nav-link text-warning fw-bold px-3" href="{% url 'account_logout' %}">🚪 Выйти ({{ user.username }})</a>
                     {% else %}
                         <a class="nav-link px-3" href="{% url 'account_login' %}">Вход</a>

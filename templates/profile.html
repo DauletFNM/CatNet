@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Мой профиль - CatNet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden;">
+            <div class="card-header bg-gradient py-4 d-flex align-items-center" style="background: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%);">
+                <h2 class="mb-0 fw-bold text-white">⚙️ Мой профиль</h2>
+            </div>
+            
+            <div class="card-body p-4">
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+
+                <form method="POST" class="mb-5">
+                    {% csrf_token %}
+                    
+                    <!-- Основная информация -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3">Основная информация</h5>
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-bold">Имя пользователя</label>
+                            <input type="text" class="form-control rounded-3" id="username" name="username" 
+                                   value="{{ user.username }}" required style="padding: 12px 20px; font-size: 1rem;">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label fw-bold">Имя</label>
+                            <input type="text" class="form-control rounded-3" id="first_name" name="first_name" 
+                                   value="{{ user.first_name }}" style="padding: 12px 20px; font-size: 1rem;">
+                        </div>
+                    </div>
+
+                    <!-- Выбор аватара -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3">Выбери аватар 🖼️</h5>
+                        
+                        <div class="row g-3">
+                            {% for avatar_url, avatar_name in avatars %}
+                                <div class="col-md-4">
+                                    <div class="avatar-card" style="cursor: pointer; border-radius: 15px; overflow: hidden; border: 3px solid #e9ecef; transition: all 0.3s;">
+                                        <input type="radio" name="avatar_url" value="{{ avatar_url }}" 
+                                               id="avatar_{{ forloop.counter }}" 
+                                               {% if profile.avatar_url == avatar_url %}checked{% endif %}
+                                               style="display: none;">
+                                        
+                                        <label for="avatar_{{ forloop.counter }}" style="display: block; cursor: pointer; margin: 0;">
+                                            <img src="{{ avatar_url }}" alt="{{ avatar_name }}" 
+                                                 style="width: 100%; height: 180px; object-fit: cover; display: block;">
+                                            <div class="p-2 text-center bg-light">
+                                                <small class="text-muted d-block">{{ avatar_name }}</small>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Текущий аватар -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3">Твой текущий аватар</h5>
+                        <div style="text-align: center;">
+                            <img src="{{ profile.avatar_url }}" alt="Текущий аватар" 
+                                 style="width: 150px; height: 150px; object-fit: cover; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        </div>
+                    </div>
+
+                    <!-- Кнопка сохранения -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary rounded-3 px-4 py-2 fw-bold" 
+                                style="background: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%); border: none;">
+                            💾 Сохранить
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary rounded-3 px-4 py-2 fw-bold">
+                            ← Назад
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #avatar_1:checked ~ label,
+    #avatar_2:checked ~ label,
+    #avatar_3:checked ~ label,
+    #avatar_4:checked ~ label,
+    #avatar_5:checked ~ label,
+    #avatar_6:checked ~ label,
+    #avatar_7:checked ~ label,
+    #avatar_8:checked ~ label {
+        border: 3px solid #6f42c1 !important;
+    }
+    
+    .avatar-card input:checked + label img {
+        transform: scale(1.05);
+    }
+    
+    .avatar-card label {
+        transition: transform 0.3s ease;
+    }
+    
+    .avatar-card:hover {
+        box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
+        border-color: #a259ff;
+    }
+</style>
+{% endblock %}
