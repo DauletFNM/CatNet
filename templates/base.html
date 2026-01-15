@@ -99,8 +99,8 @@
 
        #witch-cat-global {
     position: fixed;
-    top: 50%; /* Поставим временно по центру высоты, чтобы точно увидеть */
-    right: -150px;
+    top: 50%;
+    left: 0;
     z-index: 9999;
     pointer-events: none;
 }
@@ -183,11 +183,14 @@
         window.addEventListener('load', () => {
             const witch = document.getElementById('witch-cat-global');
             gsap.timeline({ repeat: -1, repeatDelay: 10 })
-                .to(witch, {
-                    x: -(window.innerWidth + 300),
-                    duration: 12,
-                    ease: "none"
-                });
+                .fromTo(witch, 
+                    { x: window.innerWidth + 150 },
+                    {
+                        x: -(150),
+                        duration: 12,
+                        ease: "none"
+                    }
+                );
         });
 
         // 2. Тема
