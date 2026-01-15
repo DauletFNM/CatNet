@@ -3,7 +3,6 @@
 
 {% block content %}
 <style>
-    /* Переменные темы */
     :root {
         --chat-bg-color: #e5ddd5;
         --msg-in-bg: #ffffff;
@@ -45,7 +44,7 @@
 
     .card-footer { background-color: var(--footer-bg) !important; }
 
-    /* Стиль кнопки с анимацией */
+    
     .btn-send-animate {
         font-family: inherit;
         color: #0e100f;
@@ -65,11 +64,11 @@
         justify-content: center;
     }
 
-    /* Контейнер для гуляющей кошки-ведьмы */
+   
     #witch-cat-container {
         position: fixed;
         bottom: 20px;
-        right: -150px; /* Спрятана за экраном справа */
+        right: -150px;
         z-index: 10001;
         pointer-events: none;
     }
@@ -146,10 +145,10 @@
     
     const sendBtn = document.getElementById('send-btn');
     const btnTL = gsap.timeline({paused:true})
-        .to(sendBtn, { duration: 0.5, text: { value: 'Sending...', type: 'diff' }})
-        .to(sendBtn, { duration: 0.4, text: { value: 'Sending', type: 'diff' }, repeat: 2, yoyo: true })
-        .to(sendBtn, { text: 'Sent!', ease: 'none' }, "+=0.1")
-        .to(sendBtn, { text: 'Send', delay: 1 });
+        .to(sendBtn, { duration: 0.5, text: { value: 'Отправляется...', type: 'diff' }})
+        .to(sendBtn, { duration: 0.4, text: { value: 'Отправляется', type: 'diff' }, repeat: 2, yoyo: true })
+        .to(sendBtn, { text: 'Отправлено!', ease: 'none' }, "+=0.1")
+        .to(sendBtn, { text: 'Отправить', delay: 1 });
 
    
     const supabaseUrl = 'https://jxwpehytpxbbnfnadafd.supabase.co'; 
