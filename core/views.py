@@ -8,7 +8,6 @@ from django.views.decorators.http import require_http_methods
 
 @login_required
 def home(request):
-    # Получаем все комнаты пользователя и сортируем по последнему сообщению
     chatrooms = ChatRoom.objects.filter(users=request.user).annotate(
         last_msg_time=Max('messages__created_at')
     ).order_by('-last_msg_time')
@@ -19,20 +18,17 @@ def home(request):
 
 def user_search(request):
     query = request.GET.get('q')
-    # Заменяем results на users для соответствия шаблону
     users = User.objects.filter(Q(username__icontains=query)).exclude(id=request.user.id) if query else []
     return render(request, 'user_search.html', {'users': users, 'query': query})
 
 @login_required
 def send_friend_request(request, user_id):
     to_user = get_object_or_404(User, id=user_id)
-    # Используем поле accepted как в твоем коде
     FriendRequest.objects.get_or_create(from_user=request.user, to_user=to_user)
     return redirect('user_search')
 
 @login_required
 def friend_requests(request):
-    # Список входящих запросов
     reqs = FriendRequest.objects.filter(to_user=request.user, accepted=False)
     return render(request, 'friend_requests.html', {'requests': reqs})
 
@@ -41,18 +37,15 @@ def accept_friend_request(request, request_id):
     friend_req = get_object_or_404(FriendRequest, id=request_id, to_user=request.user)
     friend_req.accepted = True
     friend_req.save()
-    # После принятия дружбы сразу создаем чат и переходим в него
     return redirect('start_chat', user_id=friend_req.from_user.id)
 
 @login_required
 def start_chat(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
     
-    # Ищем существующую комнату на двоих
     room = ChatRoom.objects.filter(users=request.user).filter(users=other_user).first()
     
     if not room:
-        # Создаем новую комнату, если её нет
         room = ChatRoom.objects.create(name=f"Чат с {other_user.username}")
         room.users.add(request.user, other_user)
     
@@ -75,13 +68,10 @@ def chat_room(request, room_id):
 
 @login_required
 def profile(request):
-    """Профиль пользователя с изменением имени и аватара"""
     profile = request.user.profile
     
     if request.method == 'POST':
-        # Обновляем имя пользователя
         username = request.POST.get('username', '').strip()
-        first_name = request.POST.get('first_name', '').strip()
         avatar_url = request.POST.get('avatar_url', '')
         
         if username and username != request.user.username:
@@ -91,9 +81,6 @@ def profile(request):
                     'error': 'Это имя уже занято!'
                 })
             request.user.username = username
-        
-        if first_name:
-            request.user.first_name = first_name
         
         if avatar_url in [url for url, _ in AVATARS]:
             profile.avatar_url = avatar_url

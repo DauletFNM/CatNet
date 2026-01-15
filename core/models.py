@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Список доступных аватаров
 AVATARS = [
     ('https://i.pinimg.com/736x/64/ba/12/64ba126baf766711499a946cfc2e5af4.jpg', 'Кот оранжевый'),
     ('https://i.pinimg.com/736x/bd/83/62/bd8362f098ebfa82df5cdbf57e8e6b19.jpg', 'Кот чёрный'),
@@ -13,7 +12,6 @@ AVATARS = [
     ('https://i.pinimg.com/736x/e6/f5/a4/e6f5a4d3c2b1a0f9e8d7c6b5a4f3e2d1.jpg', 'Молодой кот'),
 ]
 
-# 0. Модель для профиля пользователя
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     avatar_url = models.CharField(
@@ -29,7 +27,6 @@ class UserProfile(models.Model):
     def __str__(self):
         return f"Профиль {self.user.username}"
 
-# 1. Модель для списка друзей
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(User, related_name='sent_requests', on_delete=models.CASCADE)
     to_user = models.ForeignKey(User, related_name='received_requests', on_delete=models.CASCADE)
@@ -39,7 +36,6 @@ class FriendRequest(models.Model):
     class Meta:
         unique_together = ('from_user', 'to_user')
 
-# 2. Модель для чат-комнат
 class ChatRoom(models.Model):
     name = models.CharField(max_length=255, unique=True, blank=True)
     users = models.ManyToManyField(User, related_name='rooms')
@@ -47,7 +43,6 @@ class ChatRoom(models.Model):
     def __str__(self):
         return self.name if self.name else f"Chat {self.id}"
 
-# 3. Модель для самих текстовых сообщений
 class Message(models.Model):
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE)

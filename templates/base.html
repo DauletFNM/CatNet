@@ -15,7 +15,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
 
     <style>
-        /* Стиль анимированной кнопки */
         .btn-animate {
             font-family: 'Comfortaa', cursive;
             color: #ffffff;
@@ -180,21 +179,25 @@
     <script>
         gsap.registerPlugin(TextPlugin);
 
-        // 1. Анимация Ведьмы
         window.addEventListener('load', () => {
             const witch = document.getElementById('witch-cat-global');
-            gsap.timeline({ repeat: -1, repeatDelay: 10 })
-                .fromTo(witch, 
-                    { x: window.innerWidth + 150 },
-                    {
-                        x: -(150),
-                        duration: 12,
-                        ease: "none"
-                    }
-                );
+            
+            function randomizePosition() {
+                const randomX = Math.random() * (window.innerWidth - 150);
+                const randomY = Math.random() * (window.innerHeight - 150);
+                
+                gsap.to(witch, {
+                    x: randomX,
+                    y: randomY,
+                    duration: 12,
+                    ease: "power1.inOut"
+                });
+            }
+            
+            randomizePosition();
+            setInterval(randomizePosition, 15000);
         });
 
-        // 2. Тема
         const themeBtn = document.getElementById('theme-toggle');
         const icon = themeBtn.querySelector('i');
         
