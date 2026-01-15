@@ -21,7 +21,7 @@
                 <form method="POST" class="mb-5">
                     {% csrf_token %}
                     
-                    <!-- Основная информация -->
+                    
                     <div class="mb-4">
                         <h5 class="fw-bold mb-3">Основная информация</h5>
                         
@@ -30,15 +30,9 @@
                             <input type="text" class="form-control rounded-3" id="username" name="username" 
                                    value="{{ user.username }}" required style="padding: 12px 20px; font-size: 1rem;">
                         </div>
-
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label fw-bold">Имя</label>
-                            <input type="text" class="form-control rounded-3" id="first_name" name="first_name" 
-                                   value="{{ user.first_name }}" style="padding: 12px 20px; font-size: 1rem;">
-                        </div>
                     </div>
 
-                    <!-- Выбор аватара -->
+                   
                     <div class="mb-4">
                         <h5 class="fw-bold mb-3">Выбери аватар 🖼️</h5>
                         
@@ -64,7 +58,7 @@
                         </div>
                     </div>
 
-                    <!-- Текущий аватар -->
+                    
                     <div class="mb-4">
                         <h5 class="fw-bold mb-3">Твой текущий аватар</h5>
                         <div style="text-align: center;">
@@ -73,7 +67,7 @@
                         </div>
                     </div>
 
-                    <!-- Кнопка сохранения -->
+                    
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary rounded-3 px-4 py-2 fw-bold" 
                                 style="background: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%); border: none;">

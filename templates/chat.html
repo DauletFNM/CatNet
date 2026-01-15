@@ -131,19 +131,19 @@
 <script>
     gsap.registerPlugin(TextPlugin);
 
-    // --- АНИМАЦИЯ ВЕДЬМЫ-КОШКИ ---
+  
     window.addEventListener('load', () => {
         const witch = document.getElementById('witch-cat-container');
         const tl = gsap.timeline({ repeat: -1, repeatDelay: 10 });
 
         tl.to(witch, {
-            x: -(window.innerWidth + 200), // Идет через весь экран влево
-            duration: 8, // Скорость прогулки
+            x: -(window.innerWidth + 200), 
+            duration: 8, 
             ease: "none"
         });
     });
 
-    // --- АНИМАЦИЯ КНОПКИ ---
+    
     const sendBtn = document.getElementById('send-btn');
     const btnTL = gsap.timeline({paused:true})
         .to(sendBtn, { duration: 0.5, text: { value: 'Sending...', type: 'diff' }})
@@ -151,7 +151,7 @@
         .to(sendBtn, { text: 'Sent!', ease: 'none' }, "+=0.1")
         .to(sendBtn, { text: 'Send', delay: 1 });
 
-    // SUPABASE & CHAT LOGIC
+   
     const supabaseUrl = 'https://jxwpehytpxbbnfnadafd.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4d3BlaHl0cHhiYm5mbmFkYWZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNDE1NjgsImV4cCI6MjA4MzYxNzU2OH0.llHsbsMFpMBV1VdLou95WwNhO7jmX4NxpwPEv9ibqHY'; 
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
@@ -182,7 +182,7 @@
         const input = document.getElementById('msg-text');
         if(!input.value) return;
 
-        btnTL.play(0); // Запуск анимации кнопки
+        btnTL.play(0); 
         appendMessage(input.value, true, new Date());
         
         const formData = new FormData();

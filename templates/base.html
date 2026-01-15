@@ -56,7 +56,7 @@
             color: var(--text-color);
             min-height: 100vh;
             margin: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.8s ease, color 0.8s ease;
             position: relative;
             overflow-x: hidden;
         }
@@ -69,12 +69,14 @@
             opacity: var(--overlay-opacity);
             z-index: -1;
             pointer-events: none;
+            transition: background-color 0.8s ease, opacity 0.8s ease;
         }
 
         .navbar { 
             background: var(--nav-gradient) !important; 
             box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
             border-bottom: 2px solid rgba(255,255,255,0.1);
+            transition: background 0.8s ease, box-shadow 0.8s ease;
         }
 
         .navbar-brand { font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
@@ -215,7 +217,7 @@
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
 
-        // 3. Шлейф мыши
+
         let flair = gsap.utils.toArray(".flair");
         let index = 0;
         let lastPos = { x: 0, y: 0 };
@@ -235,7 +237,7 @@
             }
         });
 
-        // 4. Глобальные кнопки .btn-animate
+ 
         document.querySelectorAll('.btn-animate').forEach(btn => {
             btn.addEventListener('click', function() {
                 gsap.timeline()

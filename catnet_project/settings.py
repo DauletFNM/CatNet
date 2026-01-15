@@ -22,16 +22,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     
-    # Твои приложения
     'core',
     
-    # Allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    # NEW! Добавляем для красивых форм
     'crispy_forms',
     'crispy_bootstrap5',
 ]
@@ -69,24 +66,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'catnet_project.wsgi.application'
 
-# База данных Supabase
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
-# Настройки почты через Resend
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" # Для теста в консоли
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# Когда будешь готов отправлять реально:
 import resend
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
-# Путь к нашему новому классу (замени 'catnet_project' на имя твоей папки с settings)
 EMAIL_BACKEND = 'catnet_project.email_backend.ResendApiBackend'
 
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
-# Важно: Resend на бесплатном тарифе требует этот адрес, если домен не привязан:
 DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
 
 # Настройки Allauth
@@ -103,22 +95,17 @@ LOGOUT_REDIRECT_URL = '/'
 ALLOWED_HOSTS = ['*'] # Для начала можно оставить так
 
 # Добавь в конец файла для статических файлов (дизайна)
+ALLOWED_HOSTS = ['*']
+
 import os
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# NEW! Современные настройки регистрации для версии 6.0+
-ACCOUNT_LOGIN_METHODS = {'username', 'email'}  # Способы входа
+ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
-# Новый способ управления полями при регистрации
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
-# NEW! Настройки Crispy Forms (для красоты)
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
