@@ -2,14 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 
 AVATARS = [
-    ('https://i.pinimg.com/736x/64/ba/12/64ba126baf766711499a946cfc2e5af4.jpg', 'Кот оранжевый'),
-    ('https://i.pinimg.com/736x/bd/83/62/bd8362f098ebfa82df5cdbf57e8e6b19.jpg', 'Кот чёрный'),
-    ('https://i.pinimg.com/736x/f4/5a/09/f45a09fecd73e0d72e19a1bc35f38c67.jpg', 'Кот серый'),
-    ('https://i.pinimg.com/736x/a1/2b/3c/a12b3c5f6e8d9f0a1b2c3d4e5f6a7b8c.jpg', 'Кот белый'),
-    ('https://i.pinimg.com/736x/9e/7d/6c/9e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b.jpg', 'Полосатый кот'),
-    ('https://i.pinimg.com/736x/c3/b2/a1/c3b2a1f9e8d7c6b5a4f3e2d1c0b9a8f7.jpg', 'Симпатичный кот'),
-    ('https://i.pinimg.com/736x/d5/e4/f3/d5e4f3c2b1a9f8e7d6c5b4a3f2e1d0c9.jpg', 'Кот спит'),
-    ('https://i.pinimg.com/736x/e6/f5/a4/e6f5a4d3c2b1a0f9e8d7c6b5a4f3e2d1.jpg', 'Молодой кот'),
+    ('https://i.pinimg.com/736x/93/ce/0f/93ce0faec07582c48a51494374f5f7fb.jpg', 'Черный парень следит'),
+    ('https://i.pinimg.com/736x/bc/77/4e/bc774eadc4eec3a42f68ed3f7eaf34f1.jpg', 'Кот позади взрыв'),
+    ('https://i.pinimg.com/736x/15/28/32/1528324423acc55f1ebde5a74899eb9b.jpg', 'Пепа'),
+    ('https://i.pinimg.com/1200x/f6/f6/cc/f6f6ccb510466e0736f224316e9c5187.jpg', 'я газель'),
+    ('https://i.pinimg.com/736x/82/e5/00/82e50027d447e50b89182f6670240c36.jpg', 'кот на троне'),
+    ('https://i.pinimg.com/736x/13/5c/27/135c27e76a14e2477059cea160c81dac.jpg', 'Симпатичная собака'),
+    ('https://i.pinimg.com/736x/4e/84/5d/4e845dfa164626eb4eea09ddb8e9576e.jpg', 'Симпл'),
+    ('https://i.pinimg.com/736x/b4/18/33/b418335314fbf4be4aa3b840eda9c840.jpg', 'вьетнам кот'),
 ]
 
 class UserProfile(models.Model):
