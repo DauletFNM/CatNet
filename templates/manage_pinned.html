@@ -28,14 +28,8 @@
                                 </small>
                             </div>
                         </div>
-                        <button class="btn btn-sm toggle-pin-btn" 
-                                data-friend-id="{{ friend.id }}"
-                                {% if friend.id in pinned_ids %}
-                                    class="btn btn-sm btn-warning unpin-single"
-                                {% else %}
-                                    class="btn btn-sm btn-outline-warning pin-single"
-                                {% endif %}
-                                >
+                        <button class="btn btn-sm toggle-pin-btn {% if friend.id in pinned_ids %}btn-warning unpin-single{% else %}btn-outline-warning pin-single{% endif %}" 
+                                data-friend-id="{{ friend.id }}">
                             {% if friend.id in pinned_ids %}
                                 Открепить ✕
                             {% else %}
@@ -80,30 +74,57 @@
     const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value || 
                      document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
-    document.querySelectorAll('.toggle-pin-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const friendId = btn.dataset.friendId;
-            const isPinned = btn.classList.contains('unpin-single');
-            
-            const endpoint = isPinned ? `/unpin-friend/${friendId}/` : `/pin-friend/${friendId}/`;
-            
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {'X-CSRFToken': csrfToken}
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'limit_exceeded') {
-                const modal = new bootstrap.Modal(document.getElementById('limitModal'));
-                modal.show();
-            } else if (data.status === 'success') {
-                location.reload();
-            } else if (data.status === 'already_pinned') {
-                alert('Этот друг уже закреплён');
-            }
+    function setupPinButtons() {
+        document.querySelectorAll('.toggle-pin-btn').forEach(btn => {
+            btn.removeEventListener('click', handlePinToggle);
+            btn.addEventListener('click', handlePinToggle);
         });
-    });
+    }
+    
+    async function handlePinToggle(e) {
+        e.preventDefault();
+        const friendId = this.dataset.friendId;
+        const button = this;
+        const isPinned = button.classList.contains('unpin-single');
+        
+        const endpoint = isPinned ? `/unpin-friend/${friendId}/` : `/pin-friend/${friendId}/`;
+        
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrfToken}
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'limit_exceeded') {
+            const modal = new bootstrap.Modal(document.getElementById('limitModal'));
+            modal.show();
+        } else if (data.status === 'success') {
+            // Обновить кнопку
+            if (isPinned) {
+                button.classList.remove('btn-warning', 'unpin-single');
+                button.classList.add('btn-outline-warning', 'pin-single');
+                button.textContent = 'Закрепить 📌';
+            } else {
+                button.classList.remove('btn-outline-warning', 'pin-single');
+                button.classList.add('btn-warning', 'unpin-single');
+                button.textContent = 'Открепить ✕';
+            }
+            
+            // Обновить статус в списке
+            const statusText = button.closest('.list-group-item').querySelector('small');
+            if (statusText) {
+                if (isPinned) {
+                    statusText.textContent = 'Не закреплён';
+                } else {
+                    statusText.textContent = 'Закреплён ✓';
+                }
+            }
+        } else if (data.status === 'already_pinned') {
+            alert('Этот друг уже закреплён');
+        }
+    }
+    
+    setupPinButtons();
 </script>
 {% endblock %}

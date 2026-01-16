@@ -37,7 +37,10 @@
         <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 fw-bold text-primary">Мои чаты</h5>
-                <a href="{% url 'user_search' %}" class="btn btn-primary btn-sm rounded-pill px-3">🔍 Найти</a>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'manage_pinned' %}" class="btn btn-warning btn-sm rounded-pill px-3" title="Управлять закреплениями">📌 Закрепления</a>
+                    <a href="{% url 'user_search' %}" class="btn btn-primary btn-sm rounded-pill px-3">🔍 Найти</a>
+                </div>
             </div>
             
             <div class="list-group list-group-flush">
@@ -82,15 +85,6 @@
                                 </div>
                             </div>
                         </a>
-                        {% if room.users.count == 2 %}
-                            {% for u in room.users.all %}
-                                {% if u != user %}
-                                    <button class="btn btn-sm btn-outline-warning ms-2 pin-friend-btn" data-friend-id="{{ u.id }}" title="Закрепить этого друга">
-                                        <i class="fas fa-thumbtack"></i>
-                                    </button>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
                     </div>
                 {% empty %}
                     <div class="p-5 text-center">
@@ -147,51 +141,39 @@
 </div>
 
 <script>
-    document.querySelectorAll('.unpin-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const friendId = btn.dataset.friendId;
-            
-            const response = await fetch(`/unpin-friend/${friendId}/`, {
-                method: 'POST',
-                headers: {'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}
-            });
-            
-            const data = await response.json();
-            if (data.status === 'success') {
-                location.reload();
-            }
+    const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value || '';
+    
+    function setupUnpinButtons() {
+        document.querySelectorAll('.unpin-btn').forEach(btn => {
+            btn.removeEventListener('click', handleUnpin);
+            btn.addEventListener('click', handleUnpin);
         });
-    });
-
-    // Закрепление из списка чатов
-    document.querySelectorAll('.pin-friend-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const friendId = btn.dataset.friendId;
-            
-            const response = await fetch(`/pin-friend/${friendId}/`, {
-                method: 'POST',
-                headers: {'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}
-            });
-            
-            const data = await response.json();
-            
-            if (data.status === 'limit_exceeded') {
-                const modal = new bootstrap.Modal(document.getElementById('limitModal'));
-                modal.show();
-            } else if (data.status === 'success') {
-                btn.classList.add('btn-warning');
-                btn.classList.remove('btn-outline-warning');
-                alert('Друг закреплён!');
-            } else if (data.status === 'already_pinned') {
-                btn.classList.add('btn-warning');
-                btn.classList.remove('btn-outline-warning');
-                alert('Этот друг уже закреплён');
-            }
+    }
+    
+    async function handleUnpin(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const friendId = this.dataset.friendId;
+        const button = this;
+        
+        const response = await fetch(`/unpin-friend/${friendId}/`, {
+            method: 'POST',
+            headers: {'X-CSRFToken': csrfToken}
         });
-    });
+        
+        const data = await response.json();
+        if (data.status === 'success') {
+            // Удалить закреплённого друга из списка
+            button.closest('.list-group-item').remove();
+            
+            // Если это был последний, скрыть весь блок закреплённых
+            const pinnedSection = document.querySelector('.card.shadow-sm.border-0.mb-4');
+            if (pinnedSection && !pinnedSection.querySelector('.list-group-item')) {
+                pinnedSection.style.display = 'none';
+            }
+        }
+    }
+    
+    setupUnpinButtons();
 </script>
 {% endblock %}

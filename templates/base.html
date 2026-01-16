@@ -175,7 +175,6 @@
                     </button>
 
                     {% if user.is_authenticated %}
-                        <a class="nav-link px-3" href="{% url 'manage_pinned' %}" title="Управлять закреплениями">📌</a>
                         <a class="nav-link px-3" href="{% url 'user_search' %}">🔍 Поиск</a>
                         <a class="nav-link px-3" href="{% url 'friend_requests' %}">
                             <i class="fas fa-bell"></i> Уведомления
