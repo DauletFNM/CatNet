@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import date
+from dateutil.relativedelta import relativedelta
 
 AVATARS = [
     ('https://i.pinimg.com/736x/93/ce/0f/93ce0faec07582c48a51494374f5f7fb.jpg', 'Черный парень следит'),
@@ -23,7 +25,13 @@ class UserProfile(models.Model):
     )
     bio = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
+    birth_date = models.DateField(blank=True, null=True)
     max_pinned_friends = models.IntegerField(default=2)
+
+    def get_age(self):
+        if self.birth_date:
+            return relativedelta(date.today(), self.birth_date).years
+        return None
 
     def __str__(self):
         return f"Профиль {self.user.username}"

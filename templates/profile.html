@@ -30,8 +30,37 @@
                             <input type="text" class="form-control rounded-3" id="username" name="username" 
                                    value="{{ user.username }}" required style="padding: 12px 20px; font-size: 1rem;">
                         </div>
+
+                        <div class="mb-3">
+                            <label for="birth_date" class="form-label fw-bold">Дата рождения</label>
+                            <input type="date" class="form-control rounded-3" id="birth_date" name="birth_date" 
+                                   value="{% if profile.birth_date %}{{ profile.birth_date|date:'Y-m-d' }}{% endif %}" 
+                                   style="padding: 12px 20px; font-size: 1rem;">
+                        </div>
                     </div>
 
+                    <!-- Информация о профиле -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3">📊 Информация о профиле</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <p class="mb-1"><small class="text-muted">Зарегистрирован</small></p>
+                                    <p class="fw-bold">{{ profile.created_at|date:'d.m.Y' }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3">
+                                    <p class="mb-1"><small class="text-muted">Возраст</small></p>
+                                    {% if profile.get_age %}
+                                        <p class="fw-bold">{{ profile.get_age }} лет</p>
+                                    {% else %}
+                                        <p class="text-muted">Не указан</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                    
                     <div class="mb-4">
                         <h5 class="fw-bold mb-3">Выбери аватар 🖼️</h5>

@@ -77,6 +77,7 @@ def profile(request):
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         avatar_url = request.POST.get('avatar_url', '')
+        birth_date = request.POST.get('birth_date', '')
         
         if username and username != request.user.username:
             if User.objects.filter(username=username).exclude(id=request.user.id).exists():
@@ -89,6 +90,11 @@ def profile(request):
         
         if avatar_url in [url for url, _ in AVATARS]:
             profile.avatar_url = avatar_url
+        
+        if birth_date:
+            profile.birth_date = birth_date
+        elif birth_date == '':
+            profile.birth_date = None
         
         request.user.save()
         profile.save()
