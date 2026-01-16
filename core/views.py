@@ -136,6 +136,20 @@ def unpin_friend(request, friend_id):
 
 
 @login_required
+@require_http_methods(["POST"])
+def delete_message(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    
+    # Только автор может удалить сообщение
+    if message.sender != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Ты не можешь удалить это сообщение'}, status=403)
+    
+    message.delete()
+    
+    return JsonResponse({'status': 'success', 'message': 'Сообщение удалено'})
+
+
+@login_required
 def manage_pinned(request):
     pinned_friends = PinnedFriend.objects.filter(user=request.user).select_related('friend')
     pinned_ids = [pf.friend.id for pf in pinned_friends]
