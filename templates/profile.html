@@ -78,37 +78,6 @@
                         </a>
                     </div>
                 </form>
-
-                <!-- Закреплённые друзья -->
-                <div class="mt-5 pt-4 border-top">
-                    <h5 class="fw-bold mb-4">📌 Закреплённые друзья ({{ pinned_friends.count }}/{{ profile.max_pinned_friends }})</h5>
-                    
-                    {% if pinned_friends %}
-                        <div class="row g-3">
-                            {% for pinned in pinned_friends %}
-                                <div class="col-md-6">
-                                    <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-                                        <div class="card-body d-flex align-items-center justify-content-between p-3">
-                                            <div class="d-flex align-items-center">
-                                                <img src="{{ pinned.friend.profile.avatar_url }}" alt="" 
-                                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%; margin-right: 12px;">
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ pinned.friend.username }}</h6>
-                                                    <small class="text-muted">Закреплён</small>
-                                                </div>
-                                            </div>
-                                            <button class="btn btn-sm btn-outline-danger unpin-btn" data-friend-id="{{ pinned.friend.id }}">
-                                                ✕
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">Ты ещё не закрепил ни одного друга</p>
-                    {% endif %}
-                </div>
             </div>
         </div>
     </div>
@@ -139,22 +108,4 @@
         border-color: #a259ff;
     }
 </style>
-
-<script>
-    document.querySelectorAll('.unpin-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const friendId = btn.dataset.friendId;
-            
-            const response = await fetch(`/unpin-friend/${friendId}/`, {
-                method: 'POST',
-                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value}
-            });
-            
-            const data = await response.json();
-            if (data.status === 'success') {
-                location.reload();
-            }
-        });
-    });
-</script>
 {% endblock %}

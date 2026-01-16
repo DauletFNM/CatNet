@@ -49,9 +49,13 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ['created_at']
+
+    def is_deleted(self):
+        return self.deleted_at is not None
 
 
 class PinnedFriend(models.Model):

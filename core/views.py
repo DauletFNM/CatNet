@@ -11,9 +11,12 @@ def home(request):
     chatrooms = ChatRoom.objects.filter(users=request.user).annotate(
         last_msg_time=Max('messages__created_at')
     ).order_by('-last_msg_time')
+    
+    pinned_friends = PinnedFriend.objects.filter(user=request.user).select_related('friend')
 
     return render(request, 'index.html', {
         'chatrooms': chatrooms,
+        'pinned_friends': pinned_friends,
     })
 
 def user_search(request):
@@ -129,4 +132,21 @@ def unpin_friend(request, friend_id):
     friend = get_object_or_404(User, id=friend_id)
     PinnedFriend.objects.filter(user=request.user, friend=friend).delete()
     
-    return JsonResponse({'status': 'success', 'message': 'Друг откреплён'})
+    return JsonResponse({'status': 'success', 'message': 'Друг откреплен'})
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_message(request, message_id):
+    from django.utils import timezone
+    
+    message = get_object_or_404(Message, id=message_id)
+    
+    # Только автор может удалить сообщение
+    if message.sender != request.user:
+        return JsonResponse({'status': 'error', 'message': 'Ты не можешь удалить это сообщение'}, status=403)
+    
+    message.deleted_at = timezone.now()
+    message.save()
+    
+    return JsonResponse({'status': 'success', 'message': 'Сообщение удалено'})
