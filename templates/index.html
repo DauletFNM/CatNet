@@ -41,50 +41,83 @@
             
             <div class="list-group list-group-flush">
                 {% for room in chatrooms %}
-                    <a href="{% url 'chat_room' room.id %}" class="list-group-item list-group-item-action py-3 border-0 border-bottom px-4">
-                        <div class="d-flex align-items-center">
-                            {% if room.users.count > 2 %}
-                                <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white me-3 shadow-sm" 
-                                     style="width: 55px; height: 55px; background: linear-gradient(135deg, #6f42c1, #a259ff); min-width: 55px;">
-                                    <i class="fas fa-users fs-4"></i>
-                                </div>
-                            {% else %}
-                                {% for u in room.users.all %}
-                                    {% if u != user %}
-                                        <img src="{{ u.profile.avatar_url }}" 
-                                             alt="{{ u.username }}" 
-                                             class="rounded-circle me-3 shadow-sm" 
-                                             style="width: 55px; height: 55px; object-fit: cover; min-width: 55px;">
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                            
-                            <div class="flex-grow-1 overflow-hidden">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <h6 class="mb-0 fw-bold">
-                                        {% if room.users.count > 2 %}
-                                            🐾 {{ room.name }}
-                                        {% else %}
-                                            {% for u in room.users.all %}{% if u != user %}{{ u.username }}{% endif %}{% endfor %}
+                    <div class="list-group-item py-3 border-0 border-bottom px-4">
+                        <a href="{% url 'chat_room' room.id %}" class="text-decoration-none d-flex align-items-center" style="flex-grow: 1;">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                {% if room.users.count > 2 %}
+                                    <div class="rounded-circle bg-gradient d-flex align-items-center justify-content-center text-white me-3 shadow-sm" 
+                                         style="width: 55px; height: 55px; background: linear-gradient(135deg, #6f42c1, #a259ff); min-width: 55px;">
+                                        <i class="fas fa-users fs-4"></i>
+                                    </div>
+                                {% else %}
+                                    {% for u in room.users.all %}
+                                        {% if u != user %}
+                                            <img src="{{ u.profile.avatar_url }}" 
+                                                 alt="{{ u.username }}" 
+                                                 class="rounded-circle me-3 shadow-sm" 
+                                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px;">
                                         {% endif %}
-                                    </h6>
-                                    <small class="text-muted">{% if room.messages.last %}{{ room.messages.last.created_at|date:"H:i" }}{% endif %}</small>
-                                </div>
-                                <div class="text-muted small text-truncate">
-                                    {% if room.messages.last %}
-                                        <strong>{{ room.messages.last.sender.username }}:</strong> {{ room.messages.last.text }}
-                                    {% else %}
-                                        <span class="fst-italic text-opacity-50">Нет сообщений</span>
-                                    {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                
+                                <div class="flex-grow-1 overflow-hidden">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold">
+                                            {% if room.users.count > 2 %}
+                                                🐾 {{ room.name }}
+                                            {% else %}
+                                                {% for u in room.users.all %}{% if u != user %}{{ u.username }}{% endif %}{% endfor %}
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">{% if room.messages.last %}{{ room.messages.last.created_at|date:"H:i" }}{% endif %}</small>
+                                    </div>
+                                    <div class="text-muted small text-truncate">
+                                        {% if room.messages.last %}
+                                            <strong>{{ room.messages.last.sender.username }}:</strong> {{ room.messages.last.text }}
+                                        {% else %}
+                                            <span class="fst-italic text-opacity-50">Нет сообщений</span>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
+                        </a>
+                        {% if room.users.count == 2 %}
+                            {% for u in room.users.all %}
+                                {% if u != user %}
+                                    <button class="btn btn-sm btn-outline-warning ms-2 pin-friend-btn" data-friend-id="{{ u.id }}" title="Закрепить этого друга">
+                                        <i class="fas fa-thumbtack"></i>
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                 {% empty %}
                     <div class="p-5 text-center">
                         <p class="text-muted">Чатов пока нет. Начните общаться с друзьями!</p>
                     </div>
                 {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="limitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">⚠️ Лимит закреплений достигнут</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="fs-5 mb-3">Хочешь закрепить больше друзей?</p>
+                <p class="mb-2">Свяжись со мной:</p>
+                <p class="fw-bold">📧 <a href="mailto:kdaulethtc@gmail.com">kdaulethtc@gmail.com</a></p>
+                <p class="text-muted">или по Kaspi Gold:</p>
+                <p class="fw-bold">💳 4400 4303 1034 3402</p>
+                <small class="text-muted d-block mt-3">(это типо шутка 😄)</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>
@@ -131,34 +164,33 @@
         });
     });
 
-    // Обработка добавления закрепления из search
-    if (window.location.pathname.includes('search')) {
-        document.querySelectorAll('.pin-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                const friendId = btn.dataset.friendId;
-                
-                const response = await fetch(`/pin-friend/${friendId}/`, {
-                    method: 'POST',
-                    headers: {'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}
-                });
-                
-                const data = await response.json();
-                
-                if (data.status === 'limit_exceeded') {
-                    const modal = new bootstrap.Modal(document.getElementById('limitModal'));
-                    modal.show();
-                } else if (data.status === 'success') {
-                    btn.classList.add('btn-warning');
-                    btn.classList.remove('btn-outline-warning');
-                    alert(data.message);
-                } else if (data.status === 'already_pinned') {
-                    btn.classList.add('btn-warning');
-                    btn.classList.remove('btn-outline-warning');
-                    alert('Этот друг уже закреплён');
-                }
+    // Закрепление из списка чатов
+    document.querySelectorAll('.pin-friend-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const friendId = btn.dataset.friendId;
+            
+            const response = await fetch(`/pin-friend/${friendId}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}
             });
+            
+            const data = await response.json();
+            
+            if (data.status === 'limit_exceeded') {
+                const modal = new bootstrap.Modal(document.getElementById('limitModal'));
+                modal.show();
+            } else if (data.status === 'success') {
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-warning');
+                alert('Друг закреплён!');
+            } else if (data.status === 'already_pinned') {
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-warning');
+                alert('Этот друг уже закреплён');
+            }
         });
-    }
+    });
 </script>
 {% endblock %}
