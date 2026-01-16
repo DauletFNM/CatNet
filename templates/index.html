@@ -3,6 +3,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
+        {% csrf_token %}
         <!-- Закреплённые друзья -->
         {% if pinned_friends %}
         <div class="card shadow-sm border-0 mb-4" style="border-radius: 20px; overflow: hidden;">

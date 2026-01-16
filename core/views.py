@@ -136,14 +136,27 @@ def unpin_friend(request, friend_id):
 
 
 @login_required
-@require_http_methods(["POST"])
-def delete_message(request, message_id):
-    message = get_object_or_404(Message, id=message_id)
+def manage_pinned(request):
+    pinned_friends = PinnedFriend.objects.filter(user=request.user).select_related('friend')
+    pinned_ids = [pf.friend.id for pf in pinned_friends]
     
-    # Только автор может удалить сообщение
-    if message.sender != request.user:
-        return JsonResponse({'status': 'error', 'message': 'Ты не можешь удалить это сообщение'}, status=403)
+    # Получи всех друзей (с кем у пользователя есть принятые запросы дружбы)
+    friend_requests = FriendRequest.objects.filter(
+        (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
+    )
     
-    message.delete()
+    friend_ids = set()
+    for req in friend_requests:
+        if req.from_user == request.user:
+            friend_ids.add(req.to_user.id)
+        else:
+            friend_ids.add(req.from_user.id)
     
-    return JsonResponse({'status': 'success', 'message': 'Сообщение удалено'})
+    friends = User.objects.filter(id__in=friend_ids)
+    
+    return render(request, 'manage_pinned.html', {
+        'friends': friends,
+        'pinned_ids': pinned_ids,
+        'max_pinned': request.user.profile.max_pinned_friends,
+        'current_pinned_count': pinned_friends.count(),
+    })
