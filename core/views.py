@@ -138,15 +138,12 @@ def unpin_friend(request, friend_id):
 @login_required
 @require_http_methods(["POST"])
 def delete_message(request, message_id):
-    from django.utils import timezone
-    
     message = get_object_or_404(Message, id=message_id)
     
     # Только автор может удалить сообщение
     if message.sender != request.user:
         return JsonResponse({'status': 'error', 'message': 'Ты не можешь удалить это сообщение'}, status=403)
     
-    message.deleted_at = timezone.now()
-    message.save()
+    message.delete()
     
     return JsonResponse({'status': 'success', 'message': 'Сообщение удалено'})
