@@ -1,10 +1,12 @@
 from django.contrib import admin
-from .models import ChatRoom, Message, FriendRequest, UserProfile
+from .models import ChatRoom, Message, FriendRequest, UserProfile, PinnedFriend
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'avatar_display', 'created_at')
+    list_display = ('user', 'avatar_display', 'max_pinned_friends', 'created_at')
     search_fields = ('user__username',)
+    fields = ('user', 'avatar_url', 'bio', 'max_pinned_friends', 'created_at')
+    readonly_fields = ('created_at',)
     
     def avatar_display(self, obj):
         return f'<img src="{obj.avatar_url}" width="50" height="50" style="border-radius: 50%; object-fit: cover;" />'
@@ -30,3 +32,10 @@ class MessageAdmin(admin.ModelAdmin):
 class ChatRoomAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     filter_horizontal = ('users',)
+
+
+@admin.register(PinnedFriend)
+class PinnedFriendAdmin(admin.ModelAdmin):
+    list_display = ('user', 'friend', 'pinned_at')
+    search_fields = ('user__username', 'friend__username')
+    list_filter = ('pinned_at',)

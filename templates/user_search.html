@@ -24,6 +24,9 @@
                         <span class="fw-bold">{{ u.username }}</span>
                     </div>
                     <div class="d-flex gap-2">
+                        <button class="btn btn-outline-warning btn-sm rounded-pill px-3 pin-btn" data-friend-id="{{ u.id }}" title="Закрепить">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
                         <a href="{% url 'start_chat' u.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                             <i class="fas fa-paper-plane"></i>
                         </a>
@@ -42,4 +45,55 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="limitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">⚠️ Лимит закреплений достигнут</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="fs-5 mb-3">Хочешь закрепить больше друзей?</p>
+                <p class="mb-2">Свяжись со мной:</p>
+                <p class="fw-bold">📧 <a href="mailto:kdaulethtc@gmail.com">kdaulethtc@gmail.com</a></p>
+                <p class="text-muted">или по Kaspi Gold:</p>
+                <p class="fw-bold">💳 4400 4303 1034 3402</p>
+                <small class="text-muted d-block mt-3">(это типо шутка 😄)</small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.pin-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const friendId = btn.dataset.friendId;
+            
+            const response = await fetch(`/pin-friend/${friendId}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]')?.value || ''}
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'limit_exceeded') {
+                const modal = new bootstrap.Modal(document.getElementById('limitModal'));
+                modal.show();
+            } else if (data.status === 'success') {
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-warning');
+                alert(data.message);
+            } else if (data.status === 'already_pinned') {
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-warning');
+                alert('Этот друг уже закреплён');
+            }
+        });
+    });
+</script>
 {% endblock %}

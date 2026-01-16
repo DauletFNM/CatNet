@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q, Max
-from .models import FriendRequest, ChatRoom, Message, UserProfile, AVATARS
+from .models import FriendRequest, ChatRoom, Message, UserProfile, PinnedFriend, AVATARS
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
@@ -69,6 +69,7 @@ def chat_room(request, room_id):
 @login_required
 def profile(request):
     profile = request.user.profile
+    pinned_friends = PinnedFriend.objects.filter(user=request.user).select_related('friend')
     
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
@@ -78,7 +79,8 @@ def profile(request):
             if User.objects.filter(username=username).exclude(id=request.user.id).exists():
                 return render(request, 'profile.html', {
                     'avatars': AVATARS,
-                    'error': 'Это имя уже занято!'
+                    'error': 'Это имя уже занято!',
+                    'pinned_friends': pinned_friends
                 })
             request.user.username = username
         
@@ -92,5 +94,39 @@ def profile(request):
     
     return render(request, 'profile.html', {
         'avatars': AVATARS,
-        'profile': profile
+        'profile': profile,
+        'pinned_friends': pinned_friends
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def pin_friend(request, friend_id):
+    friend = get_object_or_404(User, id=friend_id)
+    profile = request.user.profile
+    
+    pinned_count = PinnedFriend.objects.filter(user=request.user).count()
+    
+    if pinned_count >= profile.max_pinned_friends:
+        return JsonResponse({
+            'status': 'limit_exceeded',
+            'message': 'Лимит закреплений достигнут',
+            'email': 'kdaulethtc@gmail.com',
+            'card': '4400 4303 1034 3402'
+        })
+    
+    pinned, created = PinnedFriend.objects.get_or_create(user=request.user, friend=friend)
+    
+    return JsonResponse({
+        'status': 'success' if created else 'already_pinned',
+        'message': 'Друг закреплён' if created else 'Друг уже закреплён'
+    })
+
+
+@login_required
+@require_http_methods(["POST"])
+def unpin_friend(request, friend_id):
+    friend = get_object_or_404(User, id=friend_id)
+    PinnedFriend.objects.filter(user=request.user, friend=friend).delete()
+    
+    return JsonResponse({'status': 'success', 'message': 'Друг откреплён'})
