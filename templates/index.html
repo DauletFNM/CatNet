@@ -143,35 +143,44 @@
 <script>
     const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value || '';
     
+    console.log('CSRF Token:', csrfToken);
+    
     function setupUnpinButtons() {
         document.querySelectorAll('.unpin-btn').forEach(btn => {
-            btn.removeEventListener('click', handleUnpin);
             btn.addEventListener('click', handleUnpin);
         });
     }
     
-    async function handleUnpin(e) {
+    function handleUnpin(e) {
         e.preventDefault();
         e.stopPropagation();
         const friendId = this.dataset.friendId;
         const button = this;
         
-        const response = await fetch(`/unpin-friend/${friendId}/`, {
+        console.log('Unpinning friend:', friendId);
+        
+        fetch(`/unpin-friend/${friendId}/`, {
             method: 'POST',
             headers: {'X-CSRFToken': csrfToken}
-        });
-        
-        const data = await response.json();
-        if (data.status === 'success') {
-            // Удалить закреплённого друга из списка
-            button.closest('.list-group-item').remove();
-            
-            // Если это был последний, скрыть весь блок закреплённых
-            const pinnedSection = document.querySelector('.card.shadow-sm.border-0.mb-4');
-            if (pinnedSection && !pinnedSection.querySelector('.list-group-item')) {
-                pinnedSection.style.display = 'none';
+        }).then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        }).then(data => {
+            console.log('Response data:', data);
+            if (data.status === 'success') {
+                // Удалить закреплённого друга из списка
+                button.closest('.list-group-item').remove();
+                
+                // Если это был последний, скрыть весь блок закреплённых
+                const pinnedSection = document.querySelector('.card.shadow-sm.border-0.mb-4');
+                if (pinnedSection && !pinnedSection.querySelector('.list-group-item')) {
+                    pinnedSection.style.display = 'none';
+                }
             }
-        }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка при откреплении');
+        });
     }
     
     setupUnpinButtons();
