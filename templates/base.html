@@ -112,7 +112,7 @@
        #witch-cat-global {
     position: fixed;
     top: 50%;
-    left: 0;
+    left: -150px;
     z-index: 9999;
     pointer-events: none;
 }
@@ -193,7 +193,7 @@
         </div>
     </nav>
 
-    <div class="container pb-5" style="margin-top: 20px;">
+    <div class="container pb-5" style="margin-top: 60px;">
         {% block content %}
         {% endblock %}
     </div>
@@ -203,8 +203,9 @@
     <script>
         gsap.registerPlugin(TextPlugin);
 
-        window.addEventListener('load', () => {
+        function startWitchAnimation() {
             const witch = document.getElementById('witch-cat-global');
+            if (!witch) return;
             
             function randomizePosition() {
                 const randomX = Math.random() * (window.innerWidth - 150);
@@ -220,7 +221,11 @@
             
             randomizePosition();
             setInterval(randomizePosition, 15000);
-        });
+        }
+
+        // Запусти анимацию сразу и при load
+        startWitchAnimation();
+        window.addEventListener('load', startWitchAnimation);
 
         const themeBtn = document.getElementById('theme-toggle');
         const icon = themeBtn.querySelector('i');
