@@ -89,6 +89,13 @@
                                 </div>
                             </div>
                         </a>
+                        {% if room.users.count > 2 %}
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2" 
+                                    onclick="deleteGroupChat({{ room.id }}, '{{ room.name }}')" 
+                                    title="Удалить групповой чат">
+                                🗑️
+                            </button>
+                        {% endif %}
                     </div>
                 {% empty %}
                     <div class="p-5 text-center">
@@ -185,6 +192,28 @@
             console.error('Error:', error);
             alert('Ошибка при откреплении');
         });
+    }
+    
+    // Функция удаления группового чата
+    function deleteGroupChat(roomId, roomName) {
+        if (confirm(`Ты уверен? Это удалит групповой чат "${roomName}" со всеми сообщениями.`)) {
+            fetch(`/delete-group-chat/${roomId}/`, {
+                method: 'POST',
+                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Ошибка при удалении чата');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при удалении чата');
+            });
+        }
     }
     
     // Функция поиска чатов

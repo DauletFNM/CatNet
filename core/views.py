@@ -291,3 +291,21 @@ def create_group_chat(request):
     return render(request, 'create_group_chat.html', {
         'friends': friends,
     })
+
+
+@login_required
+@require_http_methods(["POST"])
+def delete_group_chat(request, room_id):
+    room = get_object_or_404(ChatRoom, id=room_id, users=request.user)
+    
+    # Проверяем что это групповой чат (больше 2 пользователей)
+    if room.users.count() <= 2:
+        return JsonResponse({'status': 'error', 'message': 'Это не групповой чат'}, status=400)
+    
+    # Удалить все сообщения в чате
+    Message.objects.filter(room=room).delete()
+    
+    # Удалить сам чат
+    room.delete()
+    
+    return JsonResponse({'status': 'success', 'message': 'Групповой чат удалён'})

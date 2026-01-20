@@ -20,4 +20,5 @@ urlpatterns = [
     path('manage-pinned/', views.manage_pinned, name='manage_pinned'),
     path('create-group-chat/', views.create_group_chat, name='create_group_chat'),
     path('unfriend/<int:user_id>/', views.unfriend, name='unfriend'),
+    path('delete-group-chat/<int:room_id>/', views.delete_group_chat, name='delete_group_chat'),
 ]
