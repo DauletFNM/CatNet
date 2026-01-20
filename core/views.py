@@ -300,7 +300,10 @@ def delete_group_chat(request, room_id):
     
     # Проверяем что это групповой чат (больше 2 пользователей)
     if room.users.count() <= 2:
-        return JsonResponse({'status': 'error', 'message': 'Это не групповой чат'}, status=400)
+        # Для AJAX-запросов вернем JSON с ошибкой, иначе ред��рект назад
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'error', 'message': 'Это не групповой чат'}, status=400)
+        return redirect('home')
     
     # Удалить все сообщения в чате
     Message.objects.filter(room=room).delete()
@@ -308,4 +311,7 @@ def delete_group_chat(request, room_id):
     # Удалить сам чат
     room.delete()
     
-    return JsonResponse({'status': 'success', 'message': 'Групповой чат удалён'})
+    # Если запрос AJAX — вернуть JSON, иначе редирект на главную
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success', 'message': 'Групповой чат удалён'})
+    return redirect('home')
