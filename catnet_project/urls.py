@@ -18,4 +18,5 @@ urlpatterns = [
     path('unpin-friend/<int:friend_id>/', views.unpin_friend, name='unpin_friend'),
     path('delete-message/<int:message_id>/', views.delete_message, name='delete_message'),
     path('manage-pinned/', views.manage_pinned, name='manage_pinned'),
+    path('create-group-chat/', views.create_group_chat, name='create_group_chat'),
 ]

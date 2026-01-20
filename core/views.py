@@ -191,3 +191,67 @@ def view_user_profile(request, user_id):
         'viewed_user': user,
         'viewed_profile': profile,
     })
+
+
+@login_required
+def create_group_chat(request):
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name', '').strip()
+        selected_users = request.POST.getlist('selected_users')
+        
+        if not group_name:
+            return render(request, 'index.html', {
+                'error': 'Введи название группового чата'
+            })
+        
+        if not selected_users:
+            return render(request, 'index.html', {
+                'error': 'Выбери хотя бы одного друга'
+            })
+        
+        # Проверяем что это друзья текущего пользователя
+        friend_requests = FriendRequest.objects.filter(
+            (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
+        )
+        
+        friend_ids = set()
+        for req in friend_requests:
+            if req.from_user == request.user:
+                friend_ids.add(req.to_user.id)
+            else:
+                friend_ids.add(req.from_user.id)
+        
+        # Фильтруем только друзей
+        valid_user_ids = [int(uid) for uid in selected_users if int(uid) in friend_ids]
+        
+        if not valid_user_ids:
+            return render(request, 'index.html', {
+                'error': 'Ты не можешь добавить этих пользователей'
+            })
+        
+        # Создаём групповой чат
+        room = ChatRoom.objects.create(name=group_name)
+        room.users.add(request.user)
+        
+        for user_id in valid_user_ids:
+            room.users.add(User.objects.get(id=user_id))
+        
+        return redirect('chat_room', room_id=room.id)
+    
+    # GET запрос - показываем форму с друзьями
+    friend_requests = FriendRequest.objects.filter(
+        (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
+    )
+    
+    friend_ids = set()
+    for req in friend_requests:
+        if req.from_user == request.user:
+            friend_ids.add(req.to_user.id)
+        else:
+            friend_ids.add(req.from_user.id)
+    
+    friends = User.objects.filter(id__in=friend_ids)
+    
+    return render(request, 'create_group_chat.html', {
+        'friends': friends,
+    })
