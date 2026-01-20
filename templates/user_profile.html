@@ -48,10 +48,15 @@
 
                 <!-- Кнопки действия -->
                 {% if viewed_user.id != user.id %}
-                <div class="d-flex gap-2 justify-content-center">
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
                     <a href="{% url 'start_chat' viewed_user.id %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
                         💬 Написать сообщение
                     </a>
+                    {% if is_friend %}
+                        <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-bold" onclick="unfriendUser({{ viewed_user.id }})">
+                            🚫 Удалить из друзей
+                        </button>
+                    {% endif %}
                 </div>
                 {% else %}
                 <div class="d-flex gap-2 justify-content-center">
@@ -70,4 +75,28 @@
         background: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%);
     }
 </style>
+
+<script>
+    function unfriendUser(userId) {
+        if (confirm('Ты уверен? Это удалит всю переписку с этим пользователем.')) {
+            fetch(`/unfriend/${userId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Пользователь удалён из друзей');
+                    window.location.href = '/';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ошибка при удалении из друзей');
+            });
+        }
+    }
+</script>
 {% endblock %}

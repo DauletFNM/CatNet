@@ -187,11 +187,47 @@ def view_user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
     profile = user.profile
     
+    # Проверяем, дружит ли текущий пользователь с этим человеком
+    is_friend = False
+    friend_request = FriendRequest.objects.filter(
+        (Q(from_user=request.user, to_user=user) | Q(from_user=user, to_user=request.user)) & 
+        Q(accepted=True)
+    ).first()
+    if friend_request:
+        is_friend = True
+    
     return render(request, 'user_profile.html', {
         'viewed_user': user,
         'viewed_profile': profile,
+        'is_friend': is_friend,
     })
 
+
+@login_required
+@require_http_methods(["POST"])
+def unfriend(request, user_id):
+    other_user = get_object_or_404(User, id=user_id)
+    
+    # Удалить дружбу
+    FriendRequest.objects.filter(
+        (Q(from_user=request.user, to_user=other_user) | Q(from_user=other_user, to_user=request.user)) & 
+        Q(accepted=True)
+    ).delete()
+    
+    # Найти все чаты между этими двумя пользователями
+    chatrooms = ChatRoom.objects.filter(users=request.user).filter(users=other_user)
+    
+    # Удалить все сообщения в этих чатах
+    for room in chatrooms:
+        Message.objects.filter(room=room).delete()
+    
+    # Удалить сами чаты
+    chatrooms.delete()
+    
+    # Удалить закрепления если есть
+    PinnedFriend.objects.filter(user=request.user, friend=other_user).delete()
+    
+    return JsonResponse({'status': 'success', 'message': 'Пользователь удалён из друзей'})
 
 @login_required
 def create_group_chat(request):
