@@ -19,8 +19,7 @@
                                  alt="{{ pinned.friend.username }}" 
                                  class="rounded-circle me-3 shadow-sm user-avatar-clickable" 
                                  data-user-id="{{ pinned.friend.id }}"
-                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
-                                 onclick="event.stopPropagation(); window.location.href='/user/{{ pinned.friend.id }}/'">
+                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold text-dark">{{ pinned.friend.username }}</h6>
                                 <small class="text-muted">Закреплён</small>
@@ -62,8 +61,7 @@
                                                  alt="{{ u.username }}" 
                                                  class="rounded-circle me-3 shadow-sm user-avatar-clickable" 
                                                  data-user-id="{{ u.id }}"
-                                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
-                                                 onclick="event.stopPropagation(); window.location.href='/user/{{ u.id }}/'">
+                                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;">
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
@@ -187,13 +185,20 @@
         });
     }
     
-    // Добавляем эффект масштабирования для аватаров
+    // Добавляем эффект масштабирования для аватаров и клик для перехода в профиль
     document.querySelectorAll('.user-avatar-clickable').forEach(avatar => {
         avatar.addEventListener('mouseenter', function() {
             this.style.transform = 'scale(1.1)';
         });
         avatar.addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
+        });
+        // Клик по аватару ведёт в профиль
+        avatar.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const userId = this.dataset.userId;
+            window.location.href = '/user/' + userId + '/';
         });
     });
     
