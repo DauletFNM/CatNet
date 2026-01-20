@@ -41,13 +41,14 @@
                 <div class="d-flex gap-2">
                     <a href="{% url 'create_group_chat' %}" class="btn btn-success btn-sm rounded-pill px-3" title="Создать групповой чат">🐾 Групповой чат</a>
                     <a href="{% url 'manage_pinned' %}" class="btn btn-warning btn-sm rounded-pill px-3" title="Управлять закреплениями">📌 Закрепления</a>
-                    <a href="{% url 'user_search' %}" class="btn btn-primary btn-sm rounded-pill px-3">🔍 Найти</a>
+                    <input type="text" id="chat_search" class="form-control form-control-sm rounded-pill" 
+                           placeholder="🔍 Поиск чата..." style="width: 200px; padding: 8px 15px;">
                 </div>
             </div>
             
             <div class="list-group list-group-flush">
                 {% for room in chatrooms %}
-                    <div class="list-group-item py-3 border-0 border-bottom px-4">
+                    <div class="list-group-item py-3 border-0 border-bottom px-4 chat-item" data-chat-name="{% if room.users.count > 2 %}{{ room.name|lower }}{% else %}{% for u in room.users.all %}{% if u != user %}{{ u.username|lower }}{% endif %}{% endfor %}{% endif %}">
                         <a href="{% url 'chat_room' room.id %}" class="text-decoration-none d-flex align-items-center" style="flex-grow: 1;">
                             <div class="d-flex align-items-center flex-grow-1">
                                 {% if room.users.count > 2 %}
@@ -183,6 +184,40 @@
         }).catch(error => {
             console.error('Error:', error);
             alert('Ошибка при откреплении');
+        });
+    }
+    
+    // Функция поиска чатов
+    const chatSearch = document.getElementById('chat_search');
+    if (chatSearch) {
+        chatSearch.addEventListener('keyup', function(e) {
+            const searchText = this.value.toLowerCase();
+            const chatItems = document.querySelectorAll('.chat-item');
+            
+            chatItems.forEach(item => {
+                const chatName = item.dataset.chatName || '';
+                if (chatName.includes(searchText)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            // Если ничего не найдено, показать сообщение
+            const visibleItems = Array.from(chatItems).filter(item => item.style.display !== 'none');
+            const emptyMsg = document.getElementById('no_results_msg');
+            
+            if (visibleItems.length === 0 && searchText.length > 0) {
+                if (!emptyMsg) {
+                    const msg = document.createElement('div');
+                    msg.id = 'no_results_msg';
+                    msg.className = 'p-5 text-center text-muted';
+                    msg.innerHTML = '<p>Чатов не найдено :(</p>';
+                    document.querySelector('.list-group').appendChild(msg);
+                }
+            } else if (emptyMsg) {
+                emptyMsg.remove();
+            }
         });
     }
     
