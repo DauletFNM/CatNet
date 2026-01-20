@@ -103,8 +103,8 @@
             position: fixed;
             pointer-events: none;
             z-index: 10000;
-            width: 60px; 
-            height: 60px;
+            width: 40px; 
+            height: 40px;
             opacity: 0;
             user-select: none;
         }
@@ -253,7 +253,7 @@
         let lastPos = { x: 0, y: 0 };
 
         window.addEventListener("mousemove", (e) => {
-            if (Math.hypot(lastPos.x - e.clientX, lastPos.y - e.clientY) > 15) {
+            if (Math.hypot(lastPos.x - e.clientX, lastPos.y - e.clientY) > 50) {
                 let img = flair[index % flair.length];
                 index++;
                 gsap.set(img, {
@@ -261,8 +261,8 @@
                     xPercent: -50, yPercent: -50, rotation: gsap.utils.random(-30, 30)
                 });
                 gsap.timeline()
-                    .to(img, { opacity: 1, scale: 2, duration: 0.2, ease: "back.out" })
-                    .to(img, { opacity: 0, scale: 0.5, duration: 0.6, delay: 0.1 });
+                    .to(img, { opacity: 1, scale: 1.2, duration: 0.3, ease: "back.out" })
+                    .to(img, { opacity: 0, scale: 0.5, duration: 0.5, delay: 0.2 });
                 lastPos = { x: e.clientX, y: e.clientY };
             }
         });
