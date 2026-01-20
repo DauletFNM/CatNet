@@ -53,6 +53,12 @@
                         💬 Написать сообщение
                     </a>
                 </div>
+                {% else %}
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{% url 'profile' %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+                        ✏️ Редактировать профиль
+                    </a>
+                </div>
                 {% endif %}
             </div>
         </div>
