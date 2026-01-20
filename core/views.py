@@ -180,3 +180,14 @@ def manage_pinned(request):
         'max_pinned': request.user.profile.max_pinned_friends,
         'current_pinned_count': pinned_friends.count(),
     })
+
+
+@login_required
+def view_user_profile(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    profile = user.profile
+    
+    return render(request, 'user_profile.html', {
+        'viewed_user': user,
+        'viewed_profile': profile,
+    })

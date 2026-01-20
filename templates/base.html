@@ -182,7 +182,10 @@
                                 <span class="badge bg-danger rounded-pill">{{ friend_requests_count }}</span>
                             {% endif %}
                         </a>
-                        <a class="nav-link px-3" href="{% url 'profile' %}">👤 Профиль</a>
+                        <a class="nav-link px-3" href="{% url 'view_user_profile' user.id %}" title="Мой профиль" style="cursor: pointer;">
+                            <img src="{{ user.profile.avatar_url }}" alt="Мой аватар" 
+                                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white;">
+                        </a>
                         <a class="nav-link text-warning fw-bold px-3" href="{% url 'account_logout' %}">🚪 Выйти ({{ user.username }})</a>
                     {% else %}
                         <a class="nav-link px-3" href="{% url 'account_login' %}">Вход</a>

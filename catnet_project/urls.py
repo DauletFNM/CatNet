@@ -7,6 +7,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', views.home, name='home'),
     path('profile/', views.profile, name='profile'),
+    path('user/<int:user_id>/', views.view_user_profile, name='view_user_profile'),
     path('search/', views.user_search, name='user_search'),
     path('send-request/<int:user_id>/', views.send_friend_request, name='send_friend_request'),
     path('requests/', views.friend_requests, name='friend_requests'),
