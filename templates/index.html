@@ -15,14 +15,12 @@
                 {% for pinned in pinned_friends %}
                     <div class="list-group-item py-3 border-0 border-bottom px-4 d-flex justify-content-between align-items-center">
                         <a href="{% url 'start_chat' pinned.friend.id %}" class="d-flex align-items-center text-decoration-none flex-grow-1">
-                            <a href="{% url 'view_user_profile' pinned.friend.id %}" style="text-decoration: none;">
-                                <img src="{{ pinned.friend.profile.avatar_url }}" 
-                                     alt="{{ pinned.friend.username }}" 
-                                     class="rounded-circle me-3 shadow-sm" 
-                                     style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
-                                     onmouseover="this.style.transform='scale(1.1)'"
-                                     onmouseout="this.style.transform='scale(1)'">
-                            </a>
+                            <img src="{{ pinned.friend.profile.avatar_url }}" 
+                                 alt="{{ pinned.friend.username }}" 
+                                 class="rounded-circle me-3 shadow-sm user-avatar-clickable" 
+                                 data-user-id="{{ pinned.friend.id }}"
+                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
+                                 onclick="event.stopPropagation(); window.location.href='/user/{{ pinned.friend.id }}/'">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold text-dark">{{ pinned.friend.username }}</h6>
                                 <small class="text-muted">Закреплён</small>
@@ -60,14 +58,12 @@
                                 {% else %}
                                     {% for u in room.users.all %}
                                         {% if u != user %}
-                                            <a href="{% url 'view_user_profile' u.id %}" style="text-decoration: none;">
-                                                <img src="{{ u.profile.avatar_url }}" 
-                                                     alt="{{ u.username }}" 
-                                                     class="rounded-circle me-3 shadow-sm" 
-                                                     style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
-                                                     onmouseover="this.style.transform='scale(1.1)'"
-                                                     onmouseout="this.style.transform='scale(1)'">
-                                            </a>
+                                            <img src="{{ u.profile.avatar_url }}" 
+                                                 alt="{{ u.username }}" 
+                                                 class="rounded-circle me-3 shadow-sm user-avatar-clickable" 
+                                                 data-user-id="{{ u.id }}"
+                                                 style="width: 55px; height: 55px; object-fit: cover; min-width: 55px; cursor: pointer; transition: transform 0.2s;"
+                                                 onclick="event.stopPropagation(); window.location.href='/user/{{ u.id }}/'">
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
@@ -190,6 +186,16 @@
             alert('Ошибка при откреплении');
         });
     }
+    
+    // Добавляем эффект масштабирования для аватаров
+    document.querySelectorAll('.user-avatar-clickable').forEach(avatar => {
+        avatar.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+        avatar.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
     
     setupUnpinButtons();
 </script>
