@@ -59,6 +59,8 @@
             transition: background-color 0.8s ease, color 0.8s ease;
             position: relative;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         body::before {
@@ -119,6 +121,28 @@
 
         #theme-toggle i { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .rotate-effect { transform: rotate(360deg); }
+
+        /* Footer styles */
+        .site-footer {
+            background: var(--nav-gradient);
+            color: #fff;
+            padding: 24px 0;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 -4px 12px rgba(111, 66, 193, 0.25);
+            margin-top: auto; /* push footer to bottom on short pages */
+        }
+        .site-footer a {
+            color: #fff;
+            text-decoration: none;
+            opacity: 0.95;
+        }
+        .site-footer a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        .site-footer i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -200,6 +224,35 @@
         {% block content %}
         {% endblock %}
     </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row align-items-center gy-3">
+                <div class="col-md-7">
+                    <div class="d-flex align-items-center flex-wrap gap-4">
+                        <a href="https://www.instagram.com/daauleett?igsh=cnA5ejNsbm9ua21j&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram"></i>
+                            Instagram @daauleett
+                        </a>
+                        <a href="mailto:kdaulethtc@gmail.com">
+                            <i class="fas fa-envelope"></i>
+                            kdaulethtc@gmail.com
+                        </a>
+                        <a href="https://github.com/DauletFNM" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github"></i>
+                            github.com/DauletFNM
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-5 text-md-end">
+                    <div>
+                        <i class="fas fa-location-dot"></i>
+                        Казахстан, Актобе
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
