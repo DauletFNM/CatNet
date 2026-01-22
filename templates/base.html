@@ -144,20 +144,38 @@
             margin-right: 8px;
         }
     @media (max-width: 768px) {
+            /* Уменьшаем и уводим к краям, опускаем под контент */
+            .cat-loader-left,
+            .cat-loader-right {
+                z-index: 1; /* ниже хедера/контента */
+                top: auto;
+                bottom: 80px; /* чтобы не мешали инпутам внизу */
+            }
             .cat-loader-left {
-                left: max(0px, env(safe-area-inset-left));
-                transform: translate(-10%, -50%);
+                left: calc(-10px + max(0px, env(safe-area-inset-left)));
+                transform: none;
             }
             .cat-loader-right {
-                right: max(0px, env(safe-area-inset-right));
-                transform: translate(10%, -50%);
+                right: calc(-10px + max(0px, env(safe-area-inset-right)));
+                transform: none;
             }
             .cat-loader-left dotlottie-player,
             .cat-loader-right dotlottie-player {
-                width: 110px !important;
-                height: 110px !important;
+                width: 88px !important;
+                height: 88px !important;
                 display: block;
                 margin: 0;
+                opacity: 0.7; /* менее навязчиво */
+            }
+
+            /* Убедимся, что важные части интерфейса выше */
+            .navbar,
+            .site-footer,
+            .container,
+            .modal,
+            .offcanvas {
+                position: relative;
+                z-index: 10;
             }
         }
     </style>
