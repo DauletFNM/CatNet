@@ -234,6 +234,46 @@
         body.dark-mode .text-muted { color: rgba(240,240,240,0.7) !important; }
         body.dark-mode a:not(.btn) { color: var(--text-color) !important; }
 
+        /* Профиль и выбор аватара: читаемость в тёмной теме */
+        body.dark-mode .bg-light {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .form-label,
+        body.dark-mode label { color: var(--text-color) !important; }
+        body.dark-mode .form-select,
+        body.dark-mode .form-check-input,
+        body.dark-mode input[type="file"],
+        body.dark-mode textarea {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+        body.dark-mode .form-check-label { color: var(--text-color) !important; }
+        body.dark-mode .btn-light,
+        body.dark-mode .btn-outline-secondary {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+            border-color: rgba(255,255,255,0.25) !important;
+        }
+        body.dark-mode .btn-light:hover,
+        body.dark-mode .btn-outline-secondary:hover {
+            background-color: rgba(255,255,255,0.08) !important;
+        }
+        body.dark-mode .avatar-card {
+            background-color: var(--card-bg) !important;
+            border-color: rgba(255,255,255,0.15) !important;
+        }
+        body.dark-mode .avatar-card label {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+        }
+        body.dark-mode .avatar-card .bg-light {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+
     @media (max-width: 768px) {
             /* Уменьшаем и уводим к краям, опускаем под контент */
             .cat-loader-left,
