@@ -12,7 +12,7 @@ AVATARS = [
     ('https://i.pinimg.com/736x/13/5c/27/135c27e76a14e2477059cea160c81dac.jpg', 'Симпатичная собака'),
     ('https://i.pinimg.com/736x/4e/84/5d/4e845dfa164626eb4eea09ddb8e9576e.jpg', 'Симпл'),
     ('https://i.pinimg.com/736x/b4/18/33/b418335314fbf4be4aa3b840eda9c840.jpg', 'вьетнам кот'),
-    ('https://i.pinimg.com/736x/f9/f9/6e/f9f96ec6c8db69e666833280fd7a00e4.jpg', 'кот Канагата')
+    ('https://i.pinimg.com/736x/f9/f9/6e/f9f96ec6c8db69e666833280fd7a00e4.jpg', 'кот Канагата'),
 ]
 
 class UserProfile(models.Model):
