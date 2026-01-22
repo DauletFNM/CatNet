@@ -146,7 +146,7 @@ def unpin_friend(request, friend_id):
 def delete_message(request, message_id):
     message = get_object_or_404(Message, id=message_id)
     
-    # Только автор может удалить сообщение
+
     if message.sender != request.user:
         return JsonResponse({'status': 'error', 'message': 'Ты не можешь удалить это сообщение'}, status=403)
     
@@ -160,7 +160,7 @@ def manage_pinned(request):
     pinned_friends = PinnedFriend.objects.filter(user=request.user).select_related('friend')
     pinned_ids = [pf.friend.id for pf in pinned_friends]
     
-    # Получи всех друзей (с кем у пользователя есть принятые запросы дружбы)
+
     friend_requests = FriendRequest.objects.filter(
         (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
     )
@@ -187,7 +187,7 @@ def view_user_profile(request, user_id):
     user = get_object_or_404(User, id=user_id)
     profile = user.profile
     
-    # Проверяем, дружит ли текущий пользователь с этим человеком
+   
     is_friend = False
     friend_request = FriendRequest.objects.filter(
         (Q(from_user=request.user, to_user=user) | Q(from_user=user, to_user=request.user)) & 
@@ -208,23 +208,23 @@ def view_user_profile(request, user_id):
 def unfriend(request, user_id):
     other_user = get_object_or_404(User, id=user_id)
     
-    # Удалить дружбу
+ 
     FriendRequest.objects.filter(
         (Q(from_user=request.user, to_user=other_user) | Q(from_user=other_user, to_user=request.user)) & 
         Q(accepted=True)
     ).delete()
     
-    # Найти все чаты между этими двумя пользователями
+   
     chatrooms = ChatRoom.objects.filter(users=request.user).filter(users=other_user)
     
-    # Удалить все сообщения в этих чатах
+  
     for room in chatrooms:
         Message.objects.filter(room=room).delete()
     
-    # Удалить сами чаты
+    
     chatrooms.delete()
     
-    # Удалить закрепления если есть
+  
     PinnedFriend.objects.filter(user=request.user, friend=other_user).delete()
     
     return JsonResponse({'status': 'success', 'message': 'Пользователь удалён из друзей'})
@@ -245,7 +245,7 @@ def create_group_chat(request):
                 'error': 'Выбери хотя бы одного друга'
             })
         
-        # Проверяем что это друзья текущего пользователя
+
         friend_requests = FriendRequest.objects.filter(
             (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
         )
@@ -257,7 +257,7 @@ def create_group_chat(request):
             else:
                 friend_ids.add(req.from_user.id)
         
-        # Фильтруем только друзей
+
         valid_user_ids = [int(uid) for uid in selected_users if int(uid) in friend_ids]
         
         if not valid_user_ids:
@@ -265,7 +265,7 @@ def create_group_chat(request):
                 'error': 'Ты не можешь добавить этих пользователей'
             })
         
-        # Создаём групповой чат
+    
         room = ChatRoom.objects.create(name=group_name)
         room.users.add(request.user)
         
@@ -274,7 +274,7 @@ def create_group_chat(request):
         
         return redirect('chat_room', room_id=room.id)
     
-    # GET запрос - показываем форму с друзьями
+   
     friend_requests = FriendRequest.objects.filter(
         (Q(from_user=request.user) | Q(to_user=request.user)) & Q(accepted=True)
     )
@@ -298,20 +298,19 @@ def create_group_chat(request):
 def delete_group_chat(request, room_id):
     room = get_object_or_404(ChatRoom, id=room_id, users=request.user)
     
-    # Проверяем что это групповой чат (больше 2 пользователей)
+  
     if room.users.count() <= 2:
-        # Для AJAX-запросов вернем JSON с ошибкой, иначе ред��рект назад
+    
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'status': 'error', 'message': 'Это не групповой чат'}, status=400)
         return redirect('home')
     
-    # Удалить все сообщения в чате
+  
     Message.objects.filter(room=room).delete()
     
-    # Удалить сам чат
+
     room.delete()
     
-    # Если запрос AJAX — вернуть JSON, иначе редирект на главную
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'status': 'success', 'message': 'Групповой чат удалён'})
     return redirect('home')

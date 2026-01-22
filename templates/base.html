@@ -143,6 +143,23 @@
         .site-footer i {
             margin-right: 8px;
         }
+    @media (max-width: 768px) {
+            .cat-loader-left {
+                left: max(0px, env(safe-area-inset-left));
+                transform: translate(-10%, -50%);
+            }
+            .cat-loader-right {
+                right: max(0px, env(safe-area-inset-right));
+                transform: translate(10%, -50%);
+            }
+            .cat-loader-left dotlottie-player,
+            .cat-loader-right dotlottie-player {
+                width: 110px !important;
+                height: 110px !important;
+                display: block;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -232,7 +249,7 @@
                     <div class="d-flex align-items-center flex-wrap gap-4">
                         <a href="https://www.instagram.com/daauleett?igsh=cnA5ejNsbm9ua21j&utm_source=ig_contact_invite" target="_blank" rel="noopener noreferrer">
                             <i class="fab fa-instagram"></i>
-                            Instagram @daauleett
+                            Instagram
                         </a>
                         <a href="mailto:kdaulethtc@gmail.com">
                             <i class="fas fa-envelope"></i>
@@ -279,7 +296,7 @@
             setInterval(randomizePosition, 15000);
         }
 
-        // Запусти анимацию сразу и при load
+
         startWitchAnimation();
         window.addEventListener('load', startWitchAnimation);
 
@@ -306,7 +323,6 @@
         let lastPos = { x: 0, y: 0 };
 
         window.addEventListener("mousemove", (e) => {
-            // Увеличили минимальную дистанцию, чтобы след появлялся реже
             if (Math.hypot(lastPos.x - e.clientX, lastPos.y - e.clientY) > 60) {
                 let img = flair[index % flair.length];
                 index++;

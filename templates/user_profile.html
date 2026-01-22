@@ -14,13 +14,12 @@
             </div>
             
             <div class="card-body p-5 text-center">
-                <!-- Аватар -->
                 <div class="mb-5">
                     <img src="{{ viewed_profile.avatar_url }}" alt="Аватар {{ viewed_user.username }}" 
                          style="width: 250px; height: 250px; object-fit: cover; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); border: 4px solid #6f42c1;">
                 </div>
 
-                <!-- Информация о пользователе -->
+
                 <div class="mb-5">
                     <h3 class="fw-bold mb-4">{{ viewed_user.username }}</h3>
                     
@@ -46,7 +45,6 @@
                     </div>
                 </div>
 
-                <!-- Кнопки действия -->
                 {% if viewed_user.id != user.id %}
                 <div class="d-flex gap-2 justify-content-center flex-wrap">
                     <a href="{% url 'start_chat' viewed_user.id %}" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">

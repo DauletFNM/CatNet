@@ -15,14 +15,13 @@
                 <form method="POST" class="mb-4">
                     {% csrf_token %}
 
-                    <!-- Название группы -->
+               
                     <div class="mb-4">
                         <label for="group_name" class="form-label fw-bold">Название группового чата</label>
                         <input type="text" class="form-control rounded-3" id="group_name" name="group_name" 
                                placeholder="например: Мои друзья" required style="padding: 12px 20px; font-size: 1rem;">
                     </div>
 
-                    <!-- Выбор друзей -->
                     <div class="mb-4">
                         <label class="form-label fw-bold mb-3">Выбери друзей для группы:</label>
                         
@@ -53,7 +52,7 @@
                         {% endif %}
                     </div>
 
-                    <!-- Кнопки -->
+                    
                     {% if friends %}
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary rounded-3 px-4 py-2 fw-bold" 

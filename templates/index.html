@@ -4,7 +4,7 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         {% csrf_token %}
-        <!-- Закреплённые друзья -->
+
         {% if pinned_friends %}
         <div class="card shadow-sm border-0 mb-4" style="border-radius: 20px; overflow: hidden;">
             <div class="card-header bg-white py-3">
@@ -34,7 +34,7 @@
         </div>
         {% endif %}
 
-        <!-- Мои чаты -->
+       
         <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
             <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" style="gap: 10px;">
                 <h5 class="mb-0 fw-bold text-primary">Мои чаты</h5>
@@ -90,7 +90,7 @@
                             </div>
                         </a>
                         {% if room.users.count > 2 %}
-                        {# Кнопка удаления убрана: удаление доступно изнутри чата через меню #}
+                        
                         {% endif %}
                     </div>
                 {% empty %}
@@ -175,10 +175,10 @@
         }).then(data => {
             console.log('Response data:', data);
             if (data.status === 'success') {
-                // Удалить закреплённого друга из списка
+    
                 button.closest('.list-group-item').remove();
                 
-                // Если это был последний, скрыть весь блок закреплённых
+               
                 const pinnedSection = document.querySelector('.card.shadow-sm.border-0.mb-4');
                 if (pinnedSection && !pinnedSection.querySelector('.list-group-item')) {
                     pinnedSection.style.display = 'none';
@@ -190,9 +190,9 @@
         });
     }
     
-    // Функция удаления группового чата больше не используется из списка. Удаление доступно внутри чата через модальное окно.
+
     
-    // Функция поиска чатов
+   
     const chatSearch = document.getElementById('chat_search');
     if (chatSearch) {
         chatSearch.addEventListener('keyup', function(e) {
@@ -208,7 +208,7 @@
                 }
             });
             
-            // Если ничего не найдено, показать сообщение
+          
             const visibleItems = Array.from(chatItems).filter(item => item.style.display !== 'none');
             const emptyMsg = document.getElementById('no_results_msg');
             
@@ -226,7 +226,7 @@
         });
     }
     
-    // Добавляем эффект масштабирования для аватаров и клик для перехода в профиль
+
     document.querySelectorAll('.user-avatar-clickable').forEach(avatar => {
         avatar.addEventListener('mouseenter', function() {
             this.style.transform = 'scale(1.1)';
@@ -234,7 +234,7 @@
         avatar.addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1)';
         });
-        // Клик по аватару ведёт в профиль
+      
         avatar.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
