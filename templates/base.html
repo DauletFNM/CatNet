@@ -41,10 +41,54 @@
         body.dark-mode {
             --bg-color: #1a1a1b;
             --text-color: #f0f0f0;
-            --card-bg: rgba(45, 45, 46, 0.85);
+            --card-bg: rgba(45, 45, 46, 0.92);
             --nav-gradient: linear-gradient(135deg, #4b2c85 0%, #6f42c1 100%);
-            --overlay-opacity: 0.8;
+            --overlay-opacity: 0.85;
         }
+
+        /* Общие карточки/контейнеры получают тёмный фон в dark-mode */
+        body.dark-mode .card,
+        body.dark-mode .list-group-item,
+        body.dark-mode .form-control,
+        body.dark-mode .input-group-text,
+        body.dark-mode .dropdown-menu,
+        body.dark-mode .toast,
+        body.dark-mode .alert {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .form-control::placeholder { color: rgba(240,240,240,0.6) !important; }
+        body.dark-mode .btn.btn-outline-secondary,
+        body.dark-mode .btn.btn-outline-light,
+        body.dark-mode .btn.btn-outline-dark {
+            color: var(--text-color) !important;
+            border-color: rgba(255,255,255,0.25) !important;
+        }
+        body.dark-mode .btn.btn-outline-secondary:hover,
+        body.dark-mode .btn.btn-outline-light:hover,
+        body.dark-mode .btn.btn-outline-dark:hover {
+            background-color: rgba(255,255,255,0.08) !important;
+        }
+
+        /* Типичные блоки чата: левая колонка, список сообщений, панель ввода */
+        body.dark-mode .chat-sidebar,
+        body.dark-mode .chat-list,
+        body.dark-mode .messages-wrapper,
+        body.dark-mode .message,
+        body.dark-mode .message.me,
+        body.dark-mode .message.other,
+        body.dark-mode .chat-input,
+        body.dark-mode .chat-header,
+        body.dark-mode .chat-footer {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+        }
+        body.dark-mode .message.me { background-color: rgba(99, 102, 241, 0.25) !important; }
+        body.dark-mode .message.other { background-color: rgba(255,255,255,0.06) !important; }
+        body.dark-mode .chat-divider,
+        body.dark-mode hr { border-color: rgba(255,255,255,0.12) !important; }
+        body.dark-mode .list-group-item:hover { background-color: rgba(255,255,255,0.06) !important; }
 
         body { 
             background-color: var(--bg-color); 

@@ -12,11 +12,24 @@
     }
 
     body.dark-mode {
-        --chat-bg-color: #111b21;
-        --msg-in-bg: #202c33;
-        --msg-out-bg: #005c4b;
-        --msg-text-color: #e9edef;
-        --footer-bg: #1a1a1b;
+        --chat-bg-color: #1a1c20;
+        --msg-in-bg: #24282e;
+        --msg-out-bg: #2c3138;
+        --msg-text-color: #e5e7eb;
+        --footer-bg: #1a1c20;
+    }
+
+    /* Тёмные фоны для карточки чата и заголовка */
+    body.dark-mode .card,
+    body.dark-mode .card .list-group-item {
+        background-color: #1f2228 !important;
+        color: #e5e7eb !important;
+        border-color: rgba(255,255,255,0.08) !important;
+    }
+    body.dark-mode .card-header.bg-primary {
+        background-color: #2a2f36 !important;
+        border-color: rgba(255,255,255,0.08) !important;
+        color: #e5e7eb !important;
     }
 
     #chat-messages {
