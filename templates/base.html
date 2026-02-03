@@ -19,297 +19,15 @@
         } catch(e) {}
       })();
     </script>
-    <style>
-      html.pre-dark, html.pre-dark body {
-        background-color: #000;
-        background-image: url("{% static 'black_cat_bg.png' %}");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
-        color-scheme: dark;
-      }
-    </style>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
     
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.1/dist/dotlottie-player.mjs" type="module"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
-
-    <style>
-        .btn-animate {
-            font-family: 'Comfortaa', cursive;
-            color: #ffffff;
-            background: radial-gradient(129% 99% at 120% 81%, #6f42c1 30%, #a259ff 100%);
-            background-blend-mode: color-dodge;
-            font-weight: 600;
-            border: none;
-            border-radius: 99px;
-            padding: 12px 35px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .btn-animate:active { transform: scale(0.95); }
-
-        :root {
-            --bg-color: #f0f2f5;
-            --text-color: #444;
-            --card-bg: rgba(255, 255, 255, 0.85);
-            --nav-gradient: linear-gradient(135deg, #6f42c1 0%, #a259ff 100%);
-            --overlay-opacity: 0.6;
-        }
-
-        body.dark-mode {
-            --bg-color: #000000;
-            --text-color: #f0f0f0;
-            --card-bg: rgba(45, 45, 46, 0.92);
-            --nav-gradient: linear-gradient(135deg, #4b2c85 0%, #6f42c1 100%);
-            --overlay-opacity: 0.6;
-        }
-
-        /* Общие карточки/контейнеры получают тёмный фон в dark-mode */
-        body.dark-mode .card,
-        body.dark-mode .list-group-item,
-        body.dark-mode .form-control,
-        body.dark-mode .input-group-text,
-        body.dark-mode .dropdown-menu,
-        body.dark-mode .toast,
-        body.dark-mode .alert {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.1) !important;
-        }
-        body.dark-mode .form-control::placeholder { color: rgba(240,240,240,0.6) !important; }
-        body.dark-mode .btn.btn-outline-secondary,
-        body.dark-mode .btn.btn-outline-light,
-        body.dark-mode .btn.btn-outline-dark {
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.25) !important;
-        }
-        body.dark-mode .btn.btn-outline-secondary:hover,
-        body.dark-mode .btn.btn-outline-light:hover,
-        body.dark-mode .btn.btn-outline-dark:hover {
-            background-color: rgba(255,255,255,0.08) !important;
-        }
-
-        /* Типичные блоки чата: левая колонка, список сообщений, панель ввода */
-        body.dark-mode .chat-sidebar,
-        body.dark-mode .chat-list,
-        body.dark-mode .messages-wrapper,
-        body.dark-mode .message,
-        body.dark-mode .message.me,
-        body.dark-mode .message.other,
-        body.dark-mode .chat-input,
-        body.dark-mode .chat-header,
-        body.dark-mode .chat-footer {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-        }
-        body.dark-mode .message.me { background-color: rgba(99, 102, 241, 0.25) !important; }
-        body.dark-mode .message.other { background-color: rgba(255,255,255,0.06) !important; }
-        body.dark-mode .chat-divider,
-        body.dark-mode hr { border-color: rgba(255,255,255,0.12) !important; }
-        body.dark-mode .list-group-item:hover { background-color: rgba(255,255,255,0.06) !important; }
-
-        body { 
-            background-color: var(--bg-color); 
-            background-image: url("{% static 'bg.jpg' %}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            font-family: 'Comfortaa', cursive; 
-            color: var(--text-color);
-            min-height: 100vh;
-            margin: 0;
-            transition: background-color 0.15s ease, color 0.15s ease, background-image 0.15s ease;
-            position: relative;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Подменяем фон в тёмной теме на чёрный с картинкой кота */
-        body.dark-mode {
-            background-image: url("{% static 'black_cat_bg.png' %}");
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-color);
-            opacity: var(--overlay-opacity);
-            z-index: -1;
-            pointer-events: none;
-            transition: background-color 0.15s ease, opacity 0.15s ease;
-        }
-
-        .navbar { 
-            background: var(--nav-gradient) !important; 
-            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.3);
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            transition: background 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .navbar-brand { font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-
-        .cat-loader-left {
-            position: fixed;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .cat-loader-right {
-            position: fixed;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        .flair {
-            position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            width: 80px; 
-            height: 80px;
-            opacity: 0;
-            user-select: none;
-        }
-
-       #witch-cat-global {
-    position: fixed;
-    top: 50%;
-    left: -150px;
-    z-index: 9999;
-    pointer-events: none;
-}
-
-        #theme-toggle i { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .rotate-effect { transform: rotate(360deg); }
-
-        /* Footer styles */
-        .site-footer {
-            background: var(--nav-gradient);
-            color: #fff;
-            padding: 24px 0;
-            border-top: 2px solid rgba(255,255,255,0.1);
-            box-shadow: 0 -4px 12px rgba(111, 66, 193, 0.25);
-            margin-top: auto; /* push footer to bottom on short pages */
-        }
-        .site-footer a {
-            color: #fff;
-            text-decoration: none;
-            opacity: 0.95;
-        }
-        .site-footer a:hover {
-            opacity: 1;
-            text-decoration: underline;
-        }
-        .site-footer i {
-            margin-right: 8px;
-        }
-
-        /* Доп. тёмные стили для главной: заголовки, белые фоны, ссылки */
-        body.dark-mode .card-header,
-        body.dark-mode .card-header.bg-white,
-        body.dark-mode .bg-white {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.1) !important;
-        }
-        body.dark-mode .list-group-item {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.08) !important;
-        }
-        body.dark-mode .text-dark { color: var(--text-color) !important; }
-        body.dark-mode .text-muted { color: rgba(240,240,240,0.7) !important; }
-        body.dark-mode a:not(.btn) { color: var(--text-color) !important; }
-
-        /* Профиль и выбор аватара: читаемость в тёмной теме */
-        body.dark-mode .bg-light {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.1) !important;
-        }
-        body.dark-mode .form-label,
-        body.dark-mode label { color: var(--text-color) !important; }
-        body.dark-mode .form-select,
-        body.dark-mode .form-check-input,
-        body.dark-mode input[type="file"],
-        body.dark-mode textarea {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.15) !important;
-        }
-        body.dark-mode .form-check-label { color: var(--text-color) !important; }
-        body.dark-mode .btn-light,
-        body.dark-mode .btn-outline-secondary {
-            background-color: transparent !important;
-            color: var(--text-color) !important;
-            border-color: rgba(255,255,255,0.25) !important;
-        }
-        body.dark-mode .btn-light:hover,
-        body.dark-mode .btn-outline-secondary:hover {
-            background-color: rgba(255,255,255,0.08) !important;
-        }
-        body.dark-mode .avatar-card {
-            background-color: var(--card-bg) !important;
-            border-color: rgba(255,255,255,0.15) !important;
-        }
-        body.dark-mode .avatar-card label {
-            background-color: var(--card-bg) !important;
-            color: var(--text-color) !important;
-        }
-        body.dark-mode .avatar-card .bg-light {
-            background-color: transparent !important;
-            color: var(--text-color) !important;
-        }
-
-    @media (max-width: 768px) {
-            /* Уменьшаем и уводим к краям, опускаем под контент */
-            .cat-loader-left,
-            .cat-loader-right {
-                z-index: 1; /* ниже хедера/контента */
-                top: auto;
-                bottom: 80px; /* чтобы не мешали инпутам внизу */
-            }
-            .cat-loader-left {
-                left: calc(-10px + max(0px, env(safe-area-inset-left)));
-                transform: none;
-            }
-            .cat-loader-right {
-                right: calc(-10px + max(0px, env(safe-area-inset-right)));
-                transform: none;
-            }
-            .cat-loader-left dotlottie-player,
-            .cat-loader-right dotlottie-player {
-                width: 88px !important;
-                height: 88px !important;
-                display: block;
-                margin: 0;
-                opacity: 0.7; /* менее навязчиво */
-            }
-
-            /* Убедимся, что важные части интерфейса выше */
-            .navbar,
-            .site-footer,
-            .container,
-            .modal,
-            .offcanvas {
-                position: relative;
-                z-index: 10;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body>
     <div id="witch-cat-global">
@@ -352,14 +70,14 @@
     </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-        <div style="width: 100%; display: flex; align-items: center; padding: 0 30px;">
-            <a class="navbar-brand fw-bold me-0" href="{% url 'home' %}" style="min-width: auto;">🐾 CatNet </a>
+        <div class="w-100 d-flex align-items-center px-3 px-lg-4">
+            <a class="navbar-brand fw-bold me-0" href="{% url 'home' %}">🐾 CatNet </a>
             <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav ms-auto me-0 align-items-center" style="gap: 5px;">
+                <div class="navbar-nav ms-auto me-0 align-items-center gap-1">
                     <button id="theme-toggle" class="btn btn-link nav-link px-3 text-white border-0 shadow-none">
                         <i class="fas fa-moon fs-5"></i>
                     </button>
@@ -372,9 +90,8 @@
                                 <span class="badge bg-danger rounded-pill">{{ friend_requests_count }}</span>
                             {% endif %}
                         </a>
-                        <a class="nav-link px-3" href="{% url 'profile' %}" title="Редактировать профиль" style="cursor: pointer;">
-                            <img src="{{ user.profile.avatar_url }}" alt="Мой аватар" 
-                                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white;">
+                        <a class="nav-link px-3" href="{% url 'profile' %}" title="Редактировать профиль">
+                            <img src="{{ user.profile.avatar_url }}" alt="Мой аватар" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover; border: 2px solid white;">
                         </a>
                         <a class="nav-link text-warning fw-bold px-3" href="{% url 'account_logout' %}">🚪 Выйти ({{ user.username }})</a>
                     {% else %}
@@ -386,7 +103,7 @@
         </div>
     </nav>
 
-    <div class="container pb-5" style="margin-top: 60px;">
+    <div class="container pb-5 mt-5">
         {% block content %}
         {% endblock %}
     </div>
