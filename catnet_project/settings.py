@@ -12,7 +12,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
-# Приложения
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,14 +21,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
     'core',
-    
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-
     'crispy_forms',
     'crispy_bootstrap5',
 ]
@@ -85,7 +82,6 @@ EMAIL_BACKEND = 'catnet_project.email_backend.ResendApiBackend'
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 DEFAULT_FROM_EMAIL = "onboarding@resend.dev"
 
-# Настройки Allauth
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -95,10 +91,10 @@ SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Находишь это в settings.py
-ALLOWED_HOSTS = ['*'] # Для начала можно оставить так
 
-# Добавь в конец файла для статических файлов (дизайна)
+ALLOWED_HOSTS = ['*'] 
+
+
 ALLOWED_HOSTS = ['*']
 
 import os
@@ -119,19 +115,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import os
 
-# Указываем путь к папке со статикой
+
 STATIC_URL = 'static/'
 
-# Папка, куда Django соберет все файлы дизайна для сервера Render
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Это поможет Django корректно работать с файлами на сервере
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CSP_SCRIPT_SRC = (
     "'self'", 
     "'unsafe-inline'", 
-    "'unsafe-eval'",  # Обязательно!
+    "'unsafe-eval'", 
     "https://unpkg.com", 
     "https://cdn.jsdelivr.net"
 )
@@ -139,5 +135,5 @@ CSP_SCRIPT_SRC = (
 import os
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] # Django будет искать файлы здесь
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Сюда соберутся файлы для Render
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
