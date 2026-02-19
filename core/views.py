@@ -49,7 +49,9 @@ def start_chat(request, user_id):
     room = ChatRoom.objects.filter(users=request.user).filter(users=other_user).first()
     
     if not room:
-        room = ChatRoom.objects.create(name=f"Чат с {other_user.username}")
+        room, created = ChatRoom.objects.get_or_create(
+            name=f"Чат с {other_user.username}"
+        )
         room.users.add(request.user, other_user)
     
     return redirect('chat_room', room_id=room.id)
